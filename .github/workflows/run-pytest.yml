@@ -5,23 +5,37 @@ on:
   push:
     branches: [ main ]
 
+env:
+  CACHE_NUMBER: 0  # increase to reset cache manually
+
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10"]
+        python-version: ["3.8", "3.9", "3.10"]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
+    - uses: conda-incubator/setup-miniconda@v2
+      with:
+        auto-update-conda: true
+        python-version: ${{ matrix.python-version }}
+
+    - uses: actions/cache@v2
+      with:
+        path: /usr/share/miniconda/envs/earthlib
+        key: env-${{ hashFiles('poetry.lock', 'pyproject.toml') }}-${{ env.CACHE_NUMBER }}
+      id: cache
+
+    - name: Install package
       run: |
-        pip install poetry==1.2.0
-        poetry install
+        make create
+      if: steps.cache.outputs.cache-hit != 'true'
     - name: Run pytest
       run: |
-        pytest -n auto --cov --no-cov-on-fail --cov-report=term-missing:skip-covered --cov-report xml:coverage.xml
+        make test
