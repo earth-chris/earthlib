@@ -1,0 +1,34 @@
+[tool.poetry]
+name = "earthlib"
+version = "0.3.1"
+description = "A global spectral library with earth engine tools for satellite land cover mapping."
+authors = ["earth-chris <cbanders@alumni.stanford.edu>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+earthengine-api = ">=0.1.317"
+numpy = ">=1.21.5"
+pandas = ">=1.3.5"
+spectral = ">=0.22.4"
+tqdm = ">=4.63.0"
+
+[tool.poetry.group.dev.dependencies]
+ipython = "^8.5.0"
+jupyter = "^1.0.0"
+geemap = "^0.26.0"
+pre-commit = "^3.4.0"
+pytest = "^7.4.2"
+pytest-cov = "^4.1.0"
+pytest-xdist = "^3.3.1"
+twine = "^4.0.2"
+mkdocs = "^1.5.2"
+mkdocs-material = "^9.2.8"
+mkdocstrings = {extras = ["python"], version = "^0.23.0"}
+mkdocs-jupyter = "^0.24.2"
+livereload = "^2.6.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
