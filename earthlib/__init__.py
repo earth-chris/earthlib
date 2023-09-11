@@ -9,7 +9,6 @@ from earthlib import (
     SoilPVNPV,
     Unmix,
     VegImperviousSoil,
-    __version__,
     read,
 )
 from earthlib.config import collections, metadata
