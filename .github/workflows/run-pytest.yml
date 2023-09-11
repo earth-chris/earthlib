@@ -34,6 +34,9 @@ jobs:
 
     - name: Install package
       run: |
+        pip install pipx
+        pipx ensurepath
+        pipx install poetry==1.2.0
         make create
       if: steps.cache.outputs.cache-hit != 'true'
     - name: Run pytest
