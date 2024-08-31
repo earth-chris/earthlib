@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "earthlib"
-version = "0.3.1"
+version = "0.3.2"
 description = "A global spectral library with earth engine tools for satellite land cover mapping."
 authors = ["earth-chris <cbanders@alumni.stanford.edu>"]
 license = "MIT"

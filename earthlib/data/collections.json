@@ -271,13 +271,13 @@
       "shortwave infrared 2"
     ],
     "band_names": [
-      "Nadir_Reflectance_Band3",
-      "Nadir_Reflectance_Band4",
-      "Nadir_Reflectance_Band1",
-      "Nadir_Reflectance_Band2",
-      "Nadir_Reflectance_Band5",
-      "Nadir_Reflectance_Band6",
-      "Nadir_Reflectance_Band7"
+      "sur_refl_b03",
+      "sur_refl_b04",
+      "sur_refl_b01",
+      "sur_refl_b02",
+      "sur_refl_b05",
+      "sur_refl_b06",
+      "sur_refl_b07"
     ],
     "band_widths": [
       0.02,
@@ -288,7 +288,7 @@
       0.024,
       0.05
     ],
-    "collection": "MODIS/006/MCD43A4",
+    "collection": "MODIS/061/MOD09GA",
     "scale": 0.0001
   },
   "NEON": {
@@ -1921,6 +1921,34 @@
       0.24
     ],
     "collection": "COPERNICUS/S2_SR_HARMONIZED",
+    "scale": 0.0001
+  },
+  "SkySat": {
+    "band_centers": [
+      0.4825,
+      0.555,
+      0.65,
+      0.82
+    ],
+    "band_descriptions": [
+      "blue",
+      "green",
+      "red",
+      "near infrared"
+    ],
+    "band_names": [
+      "B1",
+      "B2",
+      "B3",
+      "B4"
+    ],
+    "band_widths": [
+      0.065,
+      0.08,
+      0.09,
+      0.16
+    ],
+    "collection": null,
     "scale": 0.0001
   },
   "SuperDove": {
