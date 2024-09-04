@@ -26,7 +26,7 @@ init:
 	poetry add --lock --group dev "ipython^8.5.0" jupyter geemap pre-commit pytest pytest-cov pytest-xdist twine mkdocs mkdocs-material mkdocstrings[python] mkdocs-jupyter livereload
 
 create:
-	conda env list | grep -q ${NAME} || conda create --name=${NAME} python=${PYVERSION} -y
+	conda env list | grep -q ${NAME} || conda create --name=${NAME} python=${PYVERSION} poetry -y
 	${CONDA} poetry install
 	${CONDA} pre-commit install
 
@@ -34,7 +34,7 @@ test:
 	${CONDA} pytest -n auto --cov --no-cov-on-fail --cov-report=term-missing:skip-covered
 
 collections:
-	${CONDA} python scripts/generate_collections.py
+	${CONDA} python scripts/create-collections.py
 
 pypi:
 	rm -rf dist/
