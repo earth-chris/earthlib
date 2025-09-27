@@ -4,7 +4,6 @@ from typing import Callable
 
 import ee
 
-from earthlib.config import collections
 from earthlib.utils import getBandDescriptions, getBands
 
 
