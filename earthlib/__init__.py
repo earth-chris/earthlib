@@ -16,8 +16,7 @@ try:
         VegImperviousSoil,
     )
     from earthlib.geelib.utils import getCollection
-except ImportError as e:
-    print(e)
+except ImportError:
     pass
 
 # expose the full spectral library
