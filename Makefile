@@ -22,7 +22,7 @@ help:
 
 init:
 	poetry init --python=^3.7
-	poetry add --lock "earthengine-api>=0.1.317" "numpy>=1.21.5" "pandas>=1.3.5" "spectral>=0.22.4" "tqdm>=4.63.0"
+	poetry add --lock "numpy>=1.21.5" "pandas>=1.3.5" "spectral>=0.22.4" "tqdm>=4.63.0"
 	poetry add --lock --group dev "ipython^8.5.0" jupyter geemap pre-commit pytest pytest-cov pytest-xdist twine mkdocs mkdocs-material mkdocstrings[python] mkdocs-jupyter livereload
 
 create:
