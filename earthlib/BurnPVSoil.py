@@ -4,7 +4,8 @@ from typing import Callable, Tuple
 
 import ee
 
-from earthlib.config import N_ITERATIONS, SHADE_NORMALIZE
+from earthlib.errors import SensorError
+from earthlib.geelib.config import N_ITERATIONS, SHADE_NORMALIZE
 from earthlib.Unmix import fractionalCover
 from earthlib.utils import getBands, selectSpectra
 

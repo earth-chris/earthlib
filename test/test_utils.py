@@ -1,7 +1,5 @@
 import random
 
-import ee
-
 from earthlib import utils
 
 sensor = "Sentinel2"

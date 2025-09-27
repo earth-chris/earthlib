@@ -6,12 +6,12 @@ from typing import Callable
 
 import ee
 
-from earthlib.config import (
+from earthlib.errors import SensorError
+from earthlib.geelib.config import (
     BRDF_COEFFICIENTS_L8,
     BRDF_COEFFICIENTS_L457,
     BRDF_COEFFICIENTS_S2,
 )
-from earthlib.errors import SensorError
 
 
 def bySensor(sensor: str) -> Callable:

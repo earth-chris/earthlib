@@ -1,11 +1,8 @@
 """Routines for performing spectral unmixing on earth engine images."""
 
-from typing import Callable
-
 import ee
 
-from earthlib.config import RMSE, WEIGHT
-from earthlib.utils import selectSpectra
+from earthlib.geelib.config import RMSE, WEIGHT
 
 
 def fractionalCover(

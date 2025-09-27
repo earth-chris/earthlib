@@ -5,6 +5,7 @@ from typing import Callable
 import ee
 
 from earthlib.config import collections
+from earthlib.errors import SensorError
 
 
 def bySensor(sensor: str) -> Callable:

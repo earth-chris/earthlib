@@ -1,9 +1,5 @@
-"""Utility functions for working with spectral libraries and earth engine routines."""
+"""Utility functions for working with spectral libraries."""
 
-import os
-from warnings import warn
-
-import ee
 import numpy as np
 import spectral
 
@@ -84,18 +80,6 @@ def getCollectionName(sensor: str) -> str:
     return collection
 
 
-def getCollection(sensor: str) -> ee.ImageCollection:
-    """Returns the default image collection for a satellite sensor.
-
-    Args:
-        sensor: the name of the sensor (from earthlib.listSensors()).
-
-    Returns:
-        that sensor's ee image collection.
-    """
-    return ee.ImageCollection(getCollectionName(sensor))
-
-
 def getScaler(sensor: str) -> str:
     """Returns the scaling factor to convert sensor data to percent reflectance (0-1).
 
@@ -157,7 +141,7 @@ def getBandIndices(custom_bands: list, sensor: str) -> list:
             if band in sensor_bands:
                 indices.append(sensor_bands.index(band))
 
-    elif type(custom_bands) == str:
+    elif isinstance(custom_bands, str):
         indices.append(sensor_bands.index(custom_bands))
 
     indices.sort()

@@ -1,15 +1,16 @@
-"""Methods for running Vegetation / Impervious / Soil (VIS) unmixing."""
+"""Methods for running Soil / Photosynthetic Vegetation / Non-Photosynthetic Vegetation unmixing."""
 
 from typing import Callable, Tuple
 
 import ee
 
-from earthlib.config import N_ITERATIONS, SHADE_NORMALIZE
-from earthlib.Unmix import fractionalCover
+from earthlib.errors import SensorError
+from earthlib.geelib.config import N_ITERATIONS, SHADE_NORMALIZE
+from earthlib.geelib.Unmix import fractionalCover
 from earthlib.utils import getBands, selectSpectra
 
 # default band names
-ENDMEMBER_NAMES = ["Soil", "PV", "Impervious"]
+ENDMEMBER_NAMES = ["Soil", "PV", "NPV"]
 
 
 def bySensor(sensor: str) -> Callable:
@@ -47,7 +48,7 @@ def bySensor(sensor: str) -> Callable:
 
 
 def getEndmembers(sensor: str, bands: list, n: int = N_ITERATIONS) -> Tuple[list]:
-    """Get a series of ee.List objects with the VIS endmembers.
+    """Get a series of ee.List objects with the SoilPVNPV endmembers.
 
     Args:
         sensor: the name of the sensor (from earthlib.listSensors()).
@@ -55,16 +56,16 @@ def getEndmembers(sensor: str, bands: list, n: int = N_ITERATIONS) -> Tuple[list
         n: the number of iterations for unmixing.
 
     Returns:
-        (soil, pv, urban) endmembers
+        (soil, pv, npv) endmembers
     """
     soil_list = selectSpectra("bare", sensor, n, bands)
     pv_list = selectSpectra("vegetation", sensor, n, bands)
-    urban_list = selectSpectra("urban", sensor, n, bands)
+    npv_list = selectSpectra("npv", sensor, n, bands)
     soil = [ee.List(soil_spectra.tolist()) for soil_spectra in soil_list]
     pv = [ee.List(pv_spectra.tolist()) for pv_spectra in pv_list]
-    urban = [ee.List(urban_spectra.tolist()) for urban_spectra in urban_list]
+    npv = [ee.List(npv_spectra.tolist()) for npv_spectra in npv_list]
 
-    return soil, pv, urban
+    return soil, pv, npv
 
 
 def ASTER(
@@ -73,7 +74,7 @@ def ASTER(
     n: int = N_ITERATIONS,
     shade_normalize: bool = SHADE_NORMALIZE,
 ) -> ee.Image:
-    """Unmix an ASTER image with soil, pv, impervious endmembers.
+    """Unmix an ASTER image with soil, pv, npv endmembers.
 
     Args:
         img: the ee.Image to unmix
@@ -83,7 +84,7 @@ def ASTER(
             reduces the influences of brightness and illumination geometry.
 
     Returns:
-        unmixed: a 3-band image with bands (%soil, %pv, %impervious).
+        unmixed: a 3-band image with bands (%soil, %pv, %npv).
     """
     sensor = "ASTER"
     n_bands = len(bands)
@@ -105,7 +106,7 @@ def AVNIR2(
     n: int = N_ITERATIONS,
     shade_normalize: bool = SHADE_NORMALIZE,
 ) -> ee.Image:
-    """Unmix an AVNIR2 image with soil, pv, impervious endmembers.
+    """Unmix an AVNIR2 image with soil, pv, npv endmembers.
 
     Args:
         img: the ee.Image to unmix
@@ -115,7 +116,7 @@ def AVNIR2(
             reduces the influences of brightness and illumination geometry.
 
     Returns:
-        unmixed: a 3-band image with bands (%soil, %pv, %impervious).
+        unmixed: a 3-band image with bands (%soil, %pv, %npv).
     """
     sensor = "AVNIR2"
     n_bands = len(bands)
@@ -137,7 +138,7 @@ def DoveR(
     n: int = N_ITERATIONS,
     shade_normalize: bool = SHADE_NORMALIZE,
 ) -> ee.Image:
-    """Unmix a Landsat8 image with soil, pv, impervious endmembers.
+    """Unmix a Landsat8 image with soil, pv, npv endmembers.
 
     Args:
         img: the ee.Image to unmix
@@ -147,7 +148,7 @@ def DoveR(
             reduces the influences of brightness and illumination geometry.
 
     Returns:
-        unmixed: a 3-band image with bands (%soil, %pv, %impervious).
+        unmixed: a 3-band image with bands (%soil, %pv, %npv).
     """
     sensor = "DoveR"
     n_bands = len(bands)
@@ -169,7 +170,7 @@ def Landsat457(
     n: int = N_ITERATIONS,
     shade_normalize: bool = SHADE_NORMALIZE,
 ) -> ee.Image:
-    """Unmix a Landsat4 image with soil, pv, impervious endmembers.
+    """Unmix a Landsat4 image with soil, pv, npv endmembers.
 
     Args:
         img: the ee.Image to unmix
@@ -179,7 +180,7 @@ def Landsat457(
             reduces the influences of brightness and illumination geometry.
 
     Returns:
-        unmixed: a 3-band image with bands (%soil, %pv, %impervious).
+        unmixed: a 3-band image with bands (%soil, %pv, %npv).
     """
     sensor = "Landsat7"
     n_bands = len(bands)
@@ -201,7 +202,7 @@ def Landsat8(
     n: int = N_ITERATIONS,
     shade_normalize: bool = SHADE_NORMALIZE,
 ) -> ee.Image:
-    """Unmix a Landsat8 image with soil, pv, impervious endmembers.
+    """Unmix a Landsat8 image with soil, pv, npv endmembers.
 
     Args:
         img: the ee.Image to unmix
@@ -211,7 +212,7 @@ def Landsat8(
             reduces the influences of brightness and illumination geometry.
 
     Returns:
-        unmixed: a 3-band image with bands (%soil, %pv, %impervious).
+        unmixed: a 3-band image with bands (%soil, %pv, %npv).
     """
     sensor = "Landsat8"
     n_bands = len(bands)
@@ -233,7 +234,7 @@ def MODIS(
     n: int = N_ITERATIONS,
     shade_normalize: bool = SHADE_NORMALIZE,
 ) -> ee.Image:
-    """Unmix a MODIS image with soil, pv, impervious endmembers.
+    """Unmix a MODIS image with soil, pv, npv endmembers.
 
     Args:
         img: the ee.Image to unmix
@@ -243,7 +244,7 @@ def MODIS(
             reduces the influences of brightness and illumination geometry.
 
     Returns:
-        unmixed: a 3-band image with bands (%soil, %pv, %impervious).
+        unmixed: a 3-band image with bands (%soil, %pv, %npv).
     """
     sensor = "MODIS"
     n_bands = len(bands)
@@ -265,7 +266,7 @@ def NEON(
     n: int = N_ITERATIONS,
     shade_normalize: bool = SHADE_NORMALIZE,
 ) -> ee.Image:
-    """Unmix a NEON image with soil, pv, impervious endmembers.
+    """Unmix a NEON image with soil, pv, npv endmembers.
 
     Args:
         img: the ee.Image to unmix
@@ -275,7 +276,7 @@ def NEON(
             reduces the influences of brightness and illumination geometry.
 
     Returns:
-        unmixed: a 3-band image with bands (%soil, %pv, %impervious).
+        unmixed: a 3-band image with bands (%soil, %pv, %npv).
     """
     sensor = "NEON"
     n_bands = len(bands)
@@ -297,7 +298,7 @@ def PlanetScope(
     n: int = N_ITERATIONS,
     shade_normalize: bool = SHADE_NORMALIZE,
 ) -> ee.Image:
-    """Unmix a PlanetScope image with soil, pv, impervious endmembers.
+    """Unmix a PlanetScope image with soil, pv, npv endmembers.
 
     Args:
         img: the ee.Image to unmix
@@ -307,7 +308,7 @@ def PlanetScope(
             reduces the influences of brightness and illumination geometry.
 
     Returns:
-        unmixed: a 3-band image with bands (%soil, %pv, %impervious).
+        unmixed: a 3-band image with bands (%soil, %pv, %npv).
     """
     sensor = "PlanetScope"
     n_bands = len(bands)
@@ -329,7 +330,7 @@ def Sentinel2(
     n: int = N_ITERATIONS,
     shade_normalize: bool = SHADE_NORMALIZE,
 ) -> ee.Image:
-    """Unmix a Sentinel2 image with soil, pv, impervious endmembers.
+    """Unmix a Sentinel2 image with soil, pv, npv endmembers.
 
     Args:
         img: the ee.Image to unmix
@@ -339,7 +340,7 @@ def Sentinel2(
             reduces the influences of brightness and illumination geometry.
 
     Returns:
-        unmixed: a 3-band image with bands (%soil, %pv, %impervious).
+        unmixed: a 3-band image with bands (%soil, %pv, %npv).
     """
     sensor = "Sentinel2"
     n_bands = len(bands)
@@ -361,7 +362,7 @@ def SuperDove(
     n: int = N_ITERATIONS,
     shade_normalize: bool = SHADE_NORMALIZE,
 ) -> ee.Image:
-    """Unmix a SuperDove image with soil, pv, impervious endmembers.
+    """Unmix a SuperDove image with soil, pv, npv endmembers.
 
     Args:
         img: the ee.Image to unmix
@@ -371,7 +372,7 @@ def SuperDove(
             reduces the influences of brightness and illumination geometry.
 
     Returns:
-        unmixed: a 3-band image with bands (%soil, %pv, %impervious).
+        unmixed: a 3-band image with bands (%soil, %pv, %npv).
     """
     sensor = "SuperDove"
     n_bands = len(bands)
@@ -393,7 +394,7 @@ def VIIRS(
     n: int = N_ITERATIONS,
     shade_normalize: bool = SHADE_NORMALIZE,
 ) -> ee.Image:
-    """Unmix a VIIRS image with soil, pv, impervious endmembers.
+    """Unmix a VIIRS image with soil, pv, npv endmembers.
 
     Args:
         img: the ee.Image to unmix
@@ -403,7 +404,7 @@ def VIIRS(
             reduces the influences of brightness and illumination geometry.
 
     Returns:
-        unmixed: a 3-band image with bands (%soil, %pv, %impervious).
+        unmixed: a 3-band image with bands (%soil, %pv, %npv).
     """
     sensor = "VIIRS"
     n_bands = len(bands)
