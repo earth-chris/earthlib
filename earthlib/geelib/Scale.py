@@ -4,8 +4,8 @@ from typing import Callable
 
 import ee
 
-from earthlib.config import collections
 from earthlib.errors import SensorError
+from earthlib.sensors import supported_sensors
 
 
 def bySensor(sensor: str) -> Callable:
@@ -135,8 +135,8 @@ def PlanetScope(image: ee.Image) -> ee.Image:
 
 def getScaleParams(sensor: str) -> tuple:
     """Look-up the scale and offset values for a sensor"""
-    scale = collections[sensor].get("scale", 1)
-    offset = collections[sensor].get("offset", 0)
+    scale = supported_sensors[sensor].scale
+    offset = supported_sensors[sensor].offset
     return scale, offset
 
 

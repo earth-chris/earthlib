@@ -3,9 +3,10 @@
 import numpy as np
 import spectral
 
-from earthlib.config import collections, endmember_path, metadata
+from earthlib.config import endmember_path, metadata
 from earthlib.errors import EndmemberError, SensorError
 from earthlib.read import spectralLibrary
+from earthlib.sensors import supported_sensors
 
 
 def listSensors() -> list:
@@ -14,7 +15,7 @@ def listSensors() -> list:
     Returns:
         sensors: a list of supported sensors using the names referenced by this package.
     """
-    sensors = list(collections.keys())
+    sensors = list(supported_sensors.keys())
     return sensors
 
 
@@ -76,7 +77,7 @@ def getCollectionName(sensor: str) -> str:
         collection: a string with the earth engine collection.
     """
     validateSensor(sensor)
-    collection = collections[sensor]["collection"]
+    collection = supported_sensors[sensor].collection
     return collection
 
 
@@ -90,7 +91,7 @@ def getScaler(sensor: str) -> str:
         scaler: the scale factor to multiply.
     """
     validateSensor(sensor)
-    scaler = collections[sensor]["scale"]
+    scaler = supported_sensors[sensor].scale
     return scaler
 
 
@@ -104,7 +105,7 @@ def getBands(sensor: str) -> list:
         bands: a list of sensor-specific band names.
     """
     validateSensor(sensor)
-    bands = collections[sensor]["band_names"]
+    bands = supported_sensors[sensor].band_names
     return bands
 
 
@@ -118,7 +119,7 @@ def getBandDescriptions(sensor: str) -> list:
         bands: a list of sensor-specific band names.
     """
     validateSensor(sensor)
-    bands = collections[sensor]["band_descriptions"]
+    bands = supported_sensors[sensor].band_descriptions
     return bands
 
 
@@ -133,7 +134,7 @@ def getBandIndices(custom_bands: list, sensor: str) -> list:
         indices: list of integer band indices.
     """
     validateSensor(sensor)
-    sensor_bands = collections[sensor]["band_names"]
+    sensor_bands = supported_sensors[sensor].band_names
     indices = list()
 
     if type(custom_bands) in (list, tuple):
@@ -183,8 +184,8 @@ def selectSpectra(Type: str, sensor: str, n: int = 20, bands: list = None) -> li
             bands = getBandIndices(bands, sensor)
 
     # create a band resampler for this collection
-    sensor_centers = np.array(collections[sensor]["band_centers"])[bands]
-    sensor_fwhm = np.array(collections[sensor]["band_widths"])[bands]
+    sensor_centers = np.array(supported_sensors[sensor].band_centers)[bands]
+    sensor_fwhm = np.array(supported_sensors[sensor].band_widths)[bands]
     resampler = spectral.BandResampler(
         endmembers.band_centers, sensor_centers, fwhm2=sensor_fwhm
     )

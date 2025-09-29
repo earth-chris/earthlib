@@ -1,6 +1,5 @@
 """Default configuration paths and parameters"""
 
-import json
 import os
 
 import pandas as pd
@@ -8,11 +7,9 @@ import pandas as pd
 # file paths for the package data
 package_path = os.path.realpath(__file__)
 package_dir = os.path.dirname(package_path)
-collections_path = os.path.join(package_dir, "data", "collections.json")
 metadata_path = os.path.join(package_dir, "data", "spectra.csv")
 endmember_path = os.path.join(package_dir, "data", "spectra.sli")
+header_path = endmember_path + ".hdr"
 
 # read critical data into memory
 metadata = pd.read_csv(metadata_path)
-with open(collections_path, "r+") as f:
-    collections = json.load(f)
