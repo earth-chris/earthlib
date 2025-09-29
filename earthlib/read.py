@@ -1,6 +1,7 @@
 """Functions for reading specifically formatted data, mostly spectral libraries."""
 
 import os
+from warnings import warn
 
 import numpy as np
 import spectral
@@ -79,8 +80,8 @@ class Spectra:
         self.names = names
         self.spectra = data
 
-    def remove_water_bands(self, set_nan: bool = False) -> None:
-        """Sets reflectance data from water absorption bands to eithr 0 or NaN.
+    def remove_water_bands(self, set_nan: bool = True) -> None:
+        """Sets reflectance data from water absorption bands to either 0 or NaN.
 
         Wavelengths in the ranges of (1.35-1.46 um and 1.79-1.96 um) will be masked.
             Updates the self.spectra array in-place.
@@ -104,14 +105,12 @@ class Spectra:
         lt = np.where(self.band_centers < water_bands[0][1])
         nd = np.intersect1d(gt[0], lt[0])
         self.spectra[:, nd] = update_val
-        self.band_centers = np.delete(self.band_centers, nd)
 
         # then swir1-swir2 transition
         gt = np.where(self.band_centers > water_bands[1][0])
         lt = np.where(self.band_centers < water_bands[1][1])
         nd = np.intersect1d(gt[0], lt[0])
         self.spectra[:, nd] = update_val
-        self.band_centers = np.delete(self.band_centers, nd)
 
     def get_shortwave_bands(self) -> np.ndarray:
         """Returns indices of the bands that encompass the shortwave range.
@@ -146,7 +145,7 @@ class Spectra:
             inds: the band indices to use for normalization.
         """
         # check if indices were set and valid. if not, use all bands
-        if inds:
+        if inds is not None:
             if max(inds) > self.spectra.shape[-1]:
                 inds = range(0, self.spectra.shape[-1])
                 warn("Invalid range set. using all spectra")
@@ -184,7 +183,7 @@ class Spectra:
             osli = path
             ohdr = "{}.hdr".format(base)
         elif ext.lower() == ".hdr":
-            osli = "{}.hdr".format(base)
+            osli = base.replace(".hdr", ".sli")
             ohdr = path
         else:
             osli = "{}.sli".format(base)
@@ -267,9 +266,9 @@ def endmembers() -> Spectra:
 def jfsp(path: str) -> Spectra:
     """Reads JFSP-formatted ASCII files.
 
-    Reads the ASCII format spectral data from the joint-fire-science-program
-        and returns an object with the mean and +/- standard deviation reflectance.
-        https://www.frames.gov/assessing-burn-severity/spectral-library/overview
+    Reads the ASCII format spectral data from the Joint Fire Science Program and returns an object with the mean and +/- standard deviation reflectance.
+
+    https://www.frames.gov/assessing-burn-severity/spectral-library/overview
 
     Args:
         path: file path to the JFSP spectra text file.
@@ -279,7 +278,7 @@ def jfsp(path: str) -> Spectra:
     """
 
     # create the spectral object
-    s = spectralObject(n_spectra=1, instrument="asd")
+    s = Spectra(n_spectra=1, instrument="asd")
     s.spectra_stdevm = np.zeros(s.spectra.shape)
     s.spectra_stdevp = np.zeros(s.spectra.shape)
 
@@ -293,85 +292,6 @@ def jfsp(path: str) -> Spectra:
             s.spectra_stdevm[0, i] = line[3]
 
         return s
-
-
-def usgs(path: str) -> Spectra:
-    """Reads USGS-formatted ASCII files.
-
-    Reads ascii spectral data from USGS-format files and returns
-        the mean and +/- standard deviation.
-        https://www.sciencebase.gov/catalog/item/5807a2a2e4b0841e59e3a18d
-
-    Args:
-        path: file path the the USGS spectra text file.
-
-    Returns:
-        an earthlib Spectra with the USGS reflectance data.
-    """
-
-    # open the file and read header info
-    with open(path, "r") as f:
-        x_start = "gibberish"
-        for line in f:
-            if x_start in line:
-                break
-            if "Name:" in line:
-                spectrum_name = line.strip().split("Name:")[-1].strip()
-            if "X Units:" in line:
-                band_unit = line.strip().split()
-                band_unit = band_unit[-1].strip("()").capitalize()
-            if "Y Units:" in line:
-                refl_unit = line.strip().split()
-                refl_unit = refl_unit[-1].strip("()").capitalize()
-            if "First X Value:" in line:
-                x_start = line.strip().split()[-1]
-            if "Number of X Values:" in line:
-                n_values = int(line.strip().split()[-1])
-
-        # now that we got our header info, create the arrays
-        band_centers = np.empty(n_values)
-        reflectance = np.empty(n_values)
-
-        line = line.strip().split()
-        band_centers[0] = float(line[0])
-        reflectance[0] = float(line[1])
-
-        # resume reading through file
-        i = 1
-        for line in f:
-            line = line.strip().split()
-            band_centers[i] = float(line[0])
-            reflectance[i] = float(line[1])
-            i += 1
-
-        # some files read last -> first wavelength
-        if band_centers[0] > band_centers[-1]:
-            band_centers = band_centers[::-1]
-            reflectance = reflectance[::1]
-
-        # convert units to nanometers and scale 0-1
-        if band_unit.lower() == "micrometers":
-            band_centers *= 1000.0
-            band_unit = "Nanometers"
-
-        if refl_unit.lower() == "percent":
-            reflectance /= 100.0
-
-        # create the spectral object
-        s = Spectra(
-            n_spectra=1,
-            n_wavelengths=n_values,
-            band_centers=band_centers,
-            band_unit=band_unit,
-            band_quantity="Wavelength",
-        )
-
-        # assign relevant values
-        s.spectra[0] = reflectance
-        if spectrum_name:
-            s.names[0] = spectrum_name
-
-    return s
 
 
 def check_file(path: str) -> bool:
