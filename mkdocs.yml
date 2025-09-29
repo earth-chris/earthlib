@@ -26,7 +26,12 @@ nav:
     - Home: 'index.md'
     - Introduction: 'introduction.md'
     - Data Sources: 'sources.md'
-    - Code Documentation:
+    - Python Docs:
+        - earthlib.errors: 'module/errors.md'
+        - earthlib.read: 'module/read.md'
+        - earthlib.sensors: 'module/sensors.md'
+        - earthlib.utils: 'module/utils.md'
+    - GEE Extension Docs:
         - earthlib.BRDFCorrect: 'module/BRDFCorrect.md'
         - earthlib.BrightMask: 'module/BrightMask.md'
         - earthlib.BurnPVSoil: 'module/BurnPVSoil.md'
@@ -37,10 +42,6 @@ nav:
         - earthlib.SoilPVNPV: 'module/SoilPVNPV.md'
         - earthlib.Unmix: 'module/Unmix.md'
         - earthlib.VegImperviousSoil: 'module/VegImperviousSoil.md'
-        - earthlib.config: 'module/config.md'
-        - earthlib.errors: 'module/errors.md'
-        - earthlib.read: 'module/read.md'
-        - earthlib.utils: 'module/utils.md'
 
 # theme
 theme:

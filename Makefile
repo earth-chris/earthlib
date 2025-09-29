@@ -33,9 +33,6 @@ create:
 test:
 	${CONDA} pytest -n auto --cov --no-cov-on-fail --cov-report=term-missing:skip-covered
 
-collections:
-	${CONDA} python scripts/create-collections.py
-
 pypi:
 	rm -rf dist/
 	${CONDA} poetry build
