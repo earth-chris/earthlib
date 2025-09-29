@@ -4,6 +4,12 @@ from dataclasses import dataclass
 from typing import Literal
 
 import numpy as np
+import spectral.io.envi as envi
+
+from earthlib.config import header_path
+
+# get earthlib sensor spec from the header file
+_eli_data = envi.open(header_path)
 
 
 @dataclass
@@ -14,7 +20,7 @@ class Sensor:
     collection: str | None
     band_names: list[str]
     band_centers: np.ndarray | list[float]
-    band_widths: np.ndarray | list[float]
+    band_widths: np.ndarray | list[float] | None = None
     band_descriptions: list[str] | None = None
     scale: float = 1.0
     offset: float = 0.0
@@ -23,7 +29,8 @@ class Sensor:
 
     def __post_init__(self):
         self.band_centers = np.array(self.band_centers)
-        self.band_widths = np.array(self.band_widths)
+        if self.band_widths is not None:
+            self.band_widths = np.array(self.band_widths)
 
 
 Landsat4 = Sensor(
@@ -1964,6 +1971,17 @@ NEON = Sensor(
     scale=0.0001,
 )
 
+Earthlib = Sensor(
+    name="Earthlib",
+    collection=None,
+    band_names=[f"band_{i+1}" for i in range(_eli_data.params.ncols)],
+    band_centers=_eli_data.bands.centers,
+    wavelength_unit=_eli_data.bands.band_unit,
+    measurement_unit="reflectance",
+    scale=1,
+    offset=0,
+)
+
 supported_sensors = {
     "Landsat4": Landsat4,
     "Landsat5": Landsat5,
@@ -1972,6 +1990,7 @@ supported_sensors = {
     "Landsat9": Landsat9,
     "Sentinel2": Sentinel2,
     "MODIS": MODIS,
+    "Earthlib": Earthlib,
     "VIIRS": VIIRS,
     "AVNIR2": AVNIR2,
     "ASTER": ASTER,
