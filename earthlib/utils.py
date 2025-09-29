@@ -4,7 +4,7 @@ import numpy as np
 import spectral
 
 from earthlib.config import collections, endmember_path, metadata
-from earthlib.errors import SensorError
+from earthlib.errors import EndmemberError, SensorError
 from earthlib.read import spectralLibrary
 
 
@@ -179,7 +179,7 @@ def selectSpectra(Type: str, sensor: str, n: int = 20, bands: list = None) -> li
     if bands is None:
         bands = range(len(getBands(sensor)))
     else:
-        if type(bands[0]) is str:
+        if isinstance(bands[0], str):
             bands = getBandIndices(bands, sensor)
 
     # create a band resampler for this collection
