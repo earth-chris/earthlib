@@ -32,6 +32,11 @@ class Sensor:
         if self.band_widths is not None:
             self.band_widths = np.array(self.band_widths)
 
+    @property
+    def band_count(self) -> int:
+        """The number of bands for the sensor."""
+        return len(self.band_centers)
+
 
 Landsat4 = Sensor(
     name="Landsat4",
@@ -1976,7 +1981,7 @@ Earthlib = Sensor(
     collection=None,
     band_names=[f"band_{i+1}" for i in range(_eli_data.params.ncols)],
     band_centers=_eli_data.bands.centers,
-    wavelength_unit=_eli_data.bands.band_unit,
+    wavelength_unit=_eli_data.bands.band_unit.lower(),
     measurement_unit="reflectance",
     scale=1,
     offset=0,
