@@ -5,7 +5,7 @@ import spectral
 
 from earthlib.config import endmember_path, metadata
 from earthlib.errors import EndmemberError, SensorError
-from earthlib.read import spectralLibrary
+from earthlib.read import spectral_library
 from earthlib.sensors import supported_sensors
 
 
@@ -33,38 +33,6 @@ def validateSensor(sensor: str) -> None:
         raise SensorError(
             f"Invalid sensor: {sensor}. Supported: {', '.join(supported)}"
         )
-
-
-def listTypes(level: int = 2) -> list:
-    """Returns a list of the spectral classification types.
-
-    Args:
-        level: the level of spectral classification specificity to return. Supports integers 1-4.
-
-    Returns:
-        classes: a list of spectral data types referenced throughout this package.
-    """
-    key = f"LEVEL_{level}"
-    types = list(metadata[key].unique())
-    return types
-
-
-def getTypeLevel(Type: str) -> int:
-    """Checks whether a spectral data type is available in the endmember library.
-
-    Args:
-        Type: the type of spectra to select.
-
-    Returns:
-        level: the metadata "level" of the group for subsetting. returns 0 if not found.
-    """
-    for i in range(4):
-        level = i + 1
-        available_types = listTypes(level=level)
-        if Type in available_types:
-            return level
-
-    return 0
 
 
 def getCollectionName(sensor: str) -> str:
@@ -147,63 +115,3 @@ def getBandIndices(custom_bands: list, sensor: str) -> list:
 
     indices.sort()
     return indices
-
-
-def selectSpectra(Type: str, sensor: str, n: int = 20, bands: list = None) -> list:
-    """Subsets the earthlib spectral endmember library.
-
-    Selects endmembers from specific class, then resamples the spectra to the wavelengths
-    of a specific satellite sensor. This also performs random spectra selection.
-
-    Args:
-        Type: the type of spectra to select (from earthlib.listTypes()).
-        sensor: the sensor type to resample wavelengths to.
-        n: the number of random spectra to sample. n=0 returns all spectra.
-        bands: list of bands to use. Accepts 0-based indices or a list of band names (e.g. ["B2", "B3", "B4"]).
-
-    Returns:
-        a list of spectral endmembers resampled to a specific sensor's wavelengths.
-    """
-    validateSensor(sensor)
-
-    # get the level of the group selected
-    level = getTypeLevel(Type)
-    if level == 0:
-        raise EndmemberError(
-            f"Invalid group parameter: {Type}. Get valid values from earthlib.listTypes()."
-        )
-
-    # read the spectral library into memory
-    endmembers = spectralLibrary(endmember_path)
-
-    # subset to specific bands, if set
-    if bands is None:
-        bands = range(len(getBands(sensor)))
-    else:
-        if isinstance(bands[0], str):
-            bands = getBandIndices(bands, sensor)
-
-    # create a band resampler for this collection
-    sensor_centers = np.array(supported_sensors[sensor].band_centers)[bands]
-    sensor_fwhm = np.array(supported_sensors[sensor].band_widths)[bands]
-    resampler = spectral.BandResampler(
-        endmembers.band_centers, sensor_centers, fwhm2=sensor_fwhm
-    )
-
-    # select the endmembers from just the type passed
-    key = f"LEVEL_{level}"
-    indices = metadata[key] == Type
-    spectra_raw = endmembers.spectra[indices, :]
-
-    # subset them further if the n parameter is passed
-    if n > 0:
-        random_indices = np.random.randint(indices.sum(), size=n)
-        spectra_raw = spectra_raw[random_indices, :]
-
-    # loop through each spectrum and resample to the sensor wavelengths
-    resampled = list()
-    for i in range(spectra_raw.shape[0]):
-        spectrum = resampler(spectra_raw[i, :])
-        resampled.append(spectrum)
-
-    return resampled
