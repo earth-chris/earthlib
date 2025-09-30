@@ -10,6 +10,27 @@ from earthlib.endmembers import Spectra
 from earthlib.sensors import ASD, Sensor
 
 
+def find_envi_header(path: str) -> tuple[str, str]:
+    """Generates the file paths for an ENVI spectral library and its header file."""
+    base, ext = os.path.splitext(path)
+
+    if ext == ".hdr":
+        hdr = path
+
+    else:
+        if check_file(base + ".hdr"):
+            hdr = base + ".hdr"
+
+        else:
+            if check_file(path + ".hdr"):
+                hdr = path + ".hdr"
+
+            else:
+                raise FileNotFoundError(f"No header file found for {path}")
+
+    return hdr
+
+
 def spectral_library(
     path: str,
     sensor: Sensor | None = None,
@@ -27,15 +48,9 @@ def spectral_library(
         endmembers from the spectral library
     """
     # get the header file path
-    if check_file(path[:-4] + ".hdr"):
-        hdr = path[:-4] + ".hdr"
-    else:
-        if check_file(path + ".hdr"):
-            hdr = path + ".hdr"
-        else:
-            return None
+    hdr = find_envi_header(path)
 
-    sli = envi.open(hdr, path)
+    sli = envi.open(hdr)
 
     if sensor is None:
         sensor = Sensor(

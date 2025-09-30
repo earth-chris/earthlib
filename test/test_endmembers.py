@@ -35,6 +35,22 @@ def test_Spectra():
     assert val_1400 == 0
     assert val_1000 != 0
 
+    # test it works in micrometers
+    s.data[:] = 1
+    s.to_micrometers()
+    s.remove_water_bands(set_nan=False)
+    spectrum = s.data[0]
+    val_1400 = find_nearest(s.sensor.band_centers, 1.4, spectrum)
+    val_1000 = find_nearest(s.sensor.band_centers, 1.0, spectrum)
+    assert val_1400 == 0
+    assert val_1000 != 0
+
+    # convert back to nanometers
+    s.to_nanometers()
+    assert s.sensor.wavelength_unit == "nanometers"
+    assert max(s.sensor.band_centers <= 2500)
+    assert min(s.sensor.band_centers >= 350)
+
     # nan test for water band removal
     s = endmembers.Spectra(data=data, sensor=sensor)
     s.remove_water_bands(set_nan=True)
@@ -51,6 +67,25 @@ def test_Spectra():
     # test on a subset of bands
     s = endmembers.Spectra(data=data, sensor=sensor)
     s.brightness_normalize(inds=np.arange(10))
+
+    # test band resampling
+    s = endmembers.Spectra(data=data, sensor=sensor)
+    for target_sensor in sensors.supported_sensors.values():
+        s.to_sensor(target_sensor)
+        assert s.data.shape[1] == target_sensor.band_count
+
+    # test output path formatting
+    sli, hdr = s.format_output_paths("tmp.sli")
+    assert sli.endswith(".sli")
+    assert hdr.endswith(".hdr")
+
+    sli, hdr = s.format_output_paths("tmp")
+    assert sli.endswith(".sli")
+    assert hdr.endswith(".hdr")
+
+    sli, hdr = s.format_output_paths("tmp.hdr")
+    assert sli.endswith(".sli")
+    assert hdr.endswith(".hdr")
 
 
 def test_write_read_sli():

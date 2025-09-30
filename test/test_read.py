@@ -1,5 +1,6 @@
 import os
 
+import pytest
 import spectral.io.envi as envi
 
 from earthlib import read
@@ -16,11 +17,25 @@ def test_check_file():
     assert not read.check_file(random_str)
 
 
-# TODO: verify properties match the header file
+def test_find_envi_header():
+    # should find header with .sli extension
+    hdr = read.find_envi_header(endmember_path)
+    assert hdr == header_path
+
+    # should find header with .hdr extension
+    hdr = read.find_envi_header(header_path)
+    assert hdr == header_path
+
+    # should fail on nonexistent file
+    with pytest.raises(FileNotFoundError):
+        read.find_envi_header("nonexistent_file.sli")
+
+
 def test_read_sli():
     s = read.spectral_library(endmember_path)
-    # hdr = envi.open(header_path)
-    assert s.data is not None
+    hdr = envi.open(header_path)
+    assert s.sensor.band_count == hdr.params.ncols
+    assert (s.data == hdr.spectra).all()
 
 
 def test_jfsp():

@@ -135,6 +135,55 @@ class Spectra:
         if self.sensor.band_widths is not None:
             self.sensor.band_widths = self.sensor.band_widths[inds]
 
+    def to_nanometers(self) -> None:
+        """Converts the sensor band centers to nanometers.
+
+        Updates self.sensor.band_centers and self.sensor.wavelength_unit in-place.
+        """
+        if self.sensor.wavelength_unit.lower() == "micrometers":
+            self.sensor.band_centers *= 1000.0
+            self.sensor.wavelength_unit = "nanometers"
+        else:
+            warn("Wavelength unit already in nanometers. No conversion applied.")
+
+    def to_micrometers(self) -> None:
+        """Converts the sensor band centers to micrometers.
+
+        Updates self.sensor.band_centers and self.sensor.wavelength_unit in-place.
+        """
+        if self.sensor.wavelength_unit.lower() == "nanometers":
+            self.sensor.band_centers /= 1000.0
+            self.sensor.wavelength_unit = "micrometers"
+        else:
+            warn("Wavelength unit already in micrometers. No conversion applied.")
+
+    def to_sensor(self, sensor: Sensor) -> None:
+        """Resamples the spectra to a different sensor's band centers.
+
+        Updates self.data and self.sensor in-place.
+
+        Args:
+            sensor: the sensor object defining the instrument
+                to resample the spectra to.
+        """
+        # create a band resampler for this collection
+        resampler = spectral.BandResampler(
+            self.sensor.band_centers,
+            sensor.band_centers,
+            fwhm1=self.sensor.band_widths,
+            fwhm2=sensor.band_widths,
+        )
+
+        # loop through each spectrum and resample to the sensor wavelengths
+        resampled = list()
+        for i in range(self.data.shape[0]):
+            spectrum = resampler(self.data[i, :])
+            resampled.append(spectrum)
+
+        # update the data and sensor info in place
+        self.data = np.array(resampled, dtype=np.float32)
+        self.sensor = sensor.copy()
+
     def to_sli(
         self,
         path: str,
@@ -183,48 +232,6 @@ class Spectra:
         with open(sli, "w") as f:
             spectra.astype(np.float32).tofile(f)
 
-    def format_output_paths(self, path: str) -> tuple[str, str]:
-        """Formats the output paths for the spectral library and header.
-
-        Args:
-            path: the base file path (with or without extension).
-
-        Returns:
-            A tuple containing the paths for the spectral library and header.
-        """
-
-        # set up the output file names for the library and the header
-        base, ext = os.path.splitext(path)
-        if ext.lower() == ".sli":
-            sli = path
-            hdr = f"{base}.hdr"
-        elif ext.lower() == ".hdr":
-            sli = base.replace(".hdr", ".sli")
-            hdr = path
-        else:
-            sli = f"{base}.sli"
-            hdr = f"{base}.hdr"
-
-        return sli, hdr
-
-    @classmethod
-    def get_hdr_path(cls, path: str) -> str:
-        """Gets the header file path from a given spectral library path.
-
-        Args:
-            path: The path to the spectral library file.
-
-        Returns:
-            The path to the corresponding header file.
-        """
-        if os.path.isfile(path[:-4] + ".hdr"):
-            hdr = path[:-4] + ".hdr"
-        else:
-            if os.path.isfile(path + ".hdr"):
-                hdr = path + ".hdr"
-
-        return hdr
-
     @classmethod
     def from_sli(
         cls,
@@ -260,6 +267,48 @@ class Spectra:
             names=sli.names,
             metadata=metadata,
         )
+
+    def format_output_paths(self, path: str) -> tuple[str, str]:
+        """Formats the output paths for the spectral library and header.
+
+        Args:
+            path: the base file path (with or without extension).
+
+        Returns:
+            A tuple containing the paths for the spectral library and header.
+        """
+
+        # set up the output file names for the library and the header
+        base, ext = os.path.splitext(path)
+        if ext.lower() == ".sli":
+            sli = path
+            hdr = f"{base}.hdr"
+        elif ext.lower() == ".hdr":
+            sli = path.replace(".hdr", ".sli")
+            hdr = path
+        else:
+            sli = f"{base}.sli"
+            hdr = f"{base}.hdr"
+
+        return sli, hdr
+
+    @classmethod
+    def get_hdr_path(cls, path: str) -> str:
+        """Gets the header file path from a given spectral library path.
+
+        Args:
+            path: The path to the spectral library file.
+
+        Returns:
+            The path to the corresponding header file.
+        """
+        if os.path.isfile(path[:-4] + ".hdr"):
+            hdr = path[:-4] + ".hdr"
+        else:
+            if os.path.isfile(path + ".hdr"):
+                hdr = path + ".hdr"
+
+        return hdr
 
 
 library = Spectra.from_sli(endmember_path, sensor=Earthlib, metadata=metadata)

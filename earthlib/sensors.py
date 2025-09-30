@@ -29,10 +29,10 @@ class Sensor:
 
     def __post_init__(self):
         if not isinstance(self.band_centers, np.ndarray):
-            self.band_centers = np.array(self.band_centers)
+            self.band_centers = np.array(self.band_centers, dtype=np.float32)
         if self.band_widths is not None:
             if not isinstance(self.band_widths, np.ndarray):
-                self.band_widths = np.array(self.band_widths)
+                self.band_widths = np.array(self.band_widths, dtype=np.float32)
 
     @property
     def band_count(self) -> int:
@@ -1609,7 +1609,7 @@ Earthlib = Sensor(
     offset=0,
 )
 
-asd_centers = np.arange(350, 2501, 1)
+asd_centers = np.arange(350, 2501, 1, dtype=np.float32)
 asd_band_count = len(asd_centers)
 
 ASD = Sensor(
