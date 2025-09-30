@@ -1,7 +1,9 @@
 """Metadata specification for VIPER tools tables."""
 
 from dataclasses import asdict, dataclass
-from typing import Literal
+from typing import Iterable, Literal
+
+import pandas as pd
 
 
 @dataclass
@@ -30,3 +32,8 @@ class Schema:
     def copy(self) -> "Schema":
         """Returns a copy of the schema object."""
         return Schema(**asdict(self))
+
+
+def to_dataframe(schemas: Iterable[Schema]):
+    """Converts a list of Schema objects to a pandas DataFrame."""
+    return pd.DataFrame([asdict(s) for s in schemas])

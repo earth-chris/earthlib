@@ -1,4 +1,4 @@
-from earthlib.metadata import Schema
+from earthlib.metadata import Schema, to_dataframe
 
 
 def test_Schema():
@@ -22,3 +22,16 @@ def test_Schema():
     s_copy = s.copy()
     assert s_copy == s
     assert s_copy is not s
+
+
+def test_to_dataframe():
+    s = Schema(
+        NAME="TestSample",
+        LEVEL_1="pervious",
+        LEVEL_2="vegetation",
+    )
+    df = to_dataframe([s, s])
+    assert df.shape == (2, 9)
+    assert df["NAME"].iloc[0] == "TestSample"
+    assert df["LEVEL_1"].iloc[0] == "pervious"
+    assert df["LEVEL_2"].iloc[0] == "vegetation"
