@@ -31,7 +31,7 @@ create:
 	${CONDA} pre-commit install
 
 test:
-	${CONDA} pytest -n auto --cov --no-cov-on-fail --cov-report=term-missing:skip-covered
+	${CONDA} pytest -n auto --cov --no-cov-on-fail --cov-report=term-missing
 
 pypi:
 	rm -rf dist/

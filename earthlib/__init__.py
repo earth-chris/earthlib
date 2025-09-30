@@ -1,5 +1,5 @@
 from earthlib import read, sensors
-from earthlib.config import metadata
+from earthlib.endmembers import library
 from earthlib.sensors import supported_sensors
 from earthlib.utils import getBands, getScaler, listSensors, listTypes, selectSpectra
 
@@ -19,6 +19,3 @@ try:
     from earthlib.geelib.utils import getCollection
 except ImportError:
     pass
-
-# expose the full spectral library
-library = read.endmembers()

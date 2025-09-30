@@ -5,7 +5,7 @@ import spectral
 
 from earthlib.config import endmember_path, metadata
 from earthlib.errors import EndmemberError, SensorError
-from earthlib.read import spectralLibrary
+from earthlib.read import spectral_library
 from earthlib.sensors import supported_sensors
 
 
@@ -174,7 +174,7 @@ def selectSpectra(Type: str, sensor: str, n: int = 20, bands: list = None) -> li
         )
 
     # read the spectral library into memory
-    endmembers = spectralLibrary(endmember_path)
+    endmembers = spectral_library(endmember_path)
 
     # subset to specific bands, if set
     if bands is None:
