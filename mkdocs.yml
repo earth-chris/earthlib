@@ -33,7 +33,6 @@ nav:
         - earthlib.metadata: 'module/metadata.md'
         - earthlib.read: 'module/read.md'
         - earthlib.sensors: 'module/sensors.md'
-        - earthlib.utils: 'module/utils.md'
     - GEE Extension Docs:
         - earthlib.BRDFCorrect: 'module/BRDFCorrect.md'
         - earthlib.BrightMask: 'module/BrightMask.md'
