@@ -7,6 +7,7 @@ import numpy as np
 import spectral.io.envi as envi
 
 from earthlib.config import header_path
+from earthlib.errors import SensorError
 
 # get earthlib sensor spec from the header file
 _eli_data = envi.open(header_path)
@@ -1658,3 +1659,111 @@ supported_sensors = {
     "SuperDove": SuperDove,
     "VIIRS": VIIRS,
 }
+
+
+def list_sensors() -> list:
+    """Returns a list of the supported sensor image collections.
+
+    Returns:
+        sensors: a list of supported sensors using the names referenced by this package.
+    """
+    sensors = list(supported_sensors.keys())
+    return sensors
+
+
+def validate_sensor(sensor: str) -> None:
+    """Verify a string sensor ID is valid, raise an error otherwise.
+
+    Args:
+        sensor: the name of the sensor (from earthlib.list_sensors()).
+
+    Raises:
+        SensorError: when an invalid sensor name is passed
+    """
+    supported = list_sensors()
+    if sensor not in supported:
+        raise SensorError(
+            f"Invalid sensor: {sensor}. Supported: {', '.join(supported)}"
+        )
+
+
+def get_collection_name(sensor: str) -> str:
+    """Returns the earth engine collection name for a specific satellite sensor.
+
+    Args:
+        sensor: the name of the sensor (from earthlib.list_sensors()).
+
+    Returns:
+        collection: a string with the earth engine collection.
+    """
+    validate_sensor(sensor)
+    collection = supported_sensors[sensor].collection
+    return collection
+
+
+def get_scaler(sensor: str) -> str:
+    """Returns the scaling factor to convert sensor data to percent reflectance (0-1).
+
+    Args:
+        sensor: the name of the sensor (from earthlib.list_sensors()).
+
+    Returns:
+        scaler: the scale factor to multiply.
+    """
+    validate_sensor(sensor)
+    scaler = supported_sensors[sensor].scale
+    return scaler
+
+
+def get_bands(sensor: str) -> list:
+    """Returns a list of available band names by sensor.
+
+    Args:
+        sensor: the name of the sensor (from earthlib.list_sensors()).
+
+    Returns:
+        bands: a list of sensor-specific band names.
+    """
+    validate_sensor(sensor)
+    bands = supported_sensors[sensor].band_names
+    return bands
+
+
+def get_band_descriptions(sensor: str) -> list:
+    """Returns a list band name descriptions by sensor.
+
+    Args:
+        sensor: the name of the sensor (from earthlib.listSensors()).
+
+    Returns:
+        bands: a list of sensor-specific band names.
+    """
+    validate_sensor(sensor)
+    bands = supported_sensors[sensor].band_descriptions
+    return bands
+
+
+def get_band_indices(custom_bands: list, sensor: str) -> list:
+    """Cross-references a list of bands passed as strings to the 0-based integer indices
+
+    Args:
+        custom_bands: a list of band names.
+        sensor: a string sensor type for indexing the supported collections.
+
+    Returns:
+        indices: list of integer band indices.
+    """
+    validate_sensor(sensor)
+    sensor_bands = supported_sensors[sensor].band_names
+    indices = list()
+
+    if type(custom_bands) in (list, tuple):
+        for band in custom_bands:
+            if band in sensor_bands:
+                indices.append(sensor_bands.index(band))
+
+    elif isinstance(custom_bands, str):
+        indices.append(sensor_bands.index(custom_bands))
+
+    indices.sort()
+    return indices
