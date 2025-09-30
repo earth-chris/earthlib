@@ -33,7 +33,8 @@ class Spectra:
                 used for measurement
             names: list of names to assign to each spectrum
             metadata: dataframe containing metadata for each spectrum.
-                Should have n_spectra rows. Columns
+                Should have n_spectra rows.
+                See earthlib.metadata.Schema for expected columns.
         """
         self.sensor = sensor.copy()
         self.metadata = metadata.copy() if metadata is not None else None
