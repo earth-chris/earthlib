@@ -7,7 +7,7 @@ import pandas as pd
 import spectral.io.envi as envi
 
 from earthlib.endmembers import Spectra
-from earthlib.sensors import Sensor
+from earthlib.sensors import ASD, Sensor
 
 
 def spectral_library(
@@ -69,16 +69,21 @@ def jfsp(path: str) -> Spectra:
     """
 
     # create the spectral object
-    s = Spectra(n_spectra=1, instrument="asd")
-    s.spectra_stdevm = np.zeros(s.spectra.shape)
-    s.spectra_stdevp = np.zeros(s.spectra.shape)
+    s = Spectra(data=None, sensor=ASD)
+    print(s.data)
+    s.spectra_stdevm = np.zeros(s.data.shape)
+    s.spectra_stdevp = np.zeros(s.data.shape)
+
+    print(s.data.shape)
+    print(ASD.band_count)
+    # print(s.sensor)
 
     # open the file and read the data
     with open(path, "r") as f:
         f.readline()
         for i, line in enumerate(f):
             line = line.strip().split()
-            s.spectra[0, i] = line[1]
+            s.data[0, i] = line[1]
             s.spectra_stdevp[0, i] = line[2]
             s.spectra_stdevm[0, i] = line[3]
 

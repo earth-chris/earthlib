@@ -34,16 +34,18 @@ class Spectra:
             metadata: dataframe containing metadata for each spectrum.
                 Should have n_spectra rows. Columns
         """
-        self.data = data
-        self.sensor = sensor
-        self.names = names
-        self.metadata = metadata
+        self.sensor = sensor.copy()
+        self.metadata = metadata.copy() if metadata is not None else None
 
-        if self.data is None:
-            self.data = np.zeros((1, self.sensor.band_count))
+        if data is None:
+            self.data = np.zeros((1, self.sensor.band_count), dtype=np.float32)
+        else:
+            self.data = data.copy()
 
-        if self.names is None:
+        if names is None:
             self.names = ["spectrum_{}".format(i + 1) for i in range(len(self.data))]
+        else:
+            self.names = names.copy() if names is not None else None
 
     def __len__(self) -> int:
         """Returns the number of spectra stored."""

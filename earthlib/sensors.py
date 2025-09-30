@@ -1,6 +1,6 @@
 """Sensor definitions for common earth observing instruments."""
 
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from typing import Literal
 
 import numpy as np
@@ -28,14 +28,20 @@ class Sensor:
     measurement_unit: Literal["reflectance", "radiance", "dn"] = "reflectance"
 
     def __post_init__(self):
-        self.band_centers = np.array(self.band_centers)
+        if not isinstance(self.band_centers, np.ndarray):
+            self.band_centers = np.array(self.band_centers)
         if self.band_widths is not None:
-            self.band_widths = np.array(self.band_widths)
+            if not isinstance(self.band_widths, np.ndarray):
+                self.band_widths = np.array(self.band_widths)
 
     @property
     def band_count(self) -> int:
         """The number of bands for the sensor."""
         return len(self.band_centers)
+
+    def copy(self) -> "Sensor":
+        """Returns a copy of the sensor object."""
+        return Sensor(**asdict(self))
 
 
 Landsat4 = Sensor(
@@ -1603,7 +1609,7 @@ Earthlib = Sensor(
     offset=0,
 )
 
-asd_centers = np.arange(350, 2500)
+asd_centers = np.arange(350, 2501, 1)
 asd_band_count = len(asd_centers)
 
 ASD = Sensor(

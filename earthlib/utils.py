@@ -187,13 +187,13 @@ def selectSpectra(Type: str, sensor: str, n: int = 20, bands: list = None) -> li
     sensor_centers = np.array(supported_sensors[sensor].band_centers)[bands]
     sensor_fwhm = np.array(supported_sensors[sensor].band_widths)[bands]
     resampler = spectral.BandResampler(
-        endmembers.band_centers, sensor_centers, fwhm2=sensor_fwhm
+        endmembers.sensor.band_centers, sensor_centers, fwhm2=sensor_fwhm
     )
 
     # select the endmembers from just the type passed
     key = f"LEVEL_{level}"
     indices = metadata[key] == Type
-    spectra_raw = endmembers.spectra[indices, :]
+    spectra_raw = endmembers.data[indices, :]
 
     # subset them further if the n parameter is passed
     if n > 0:
