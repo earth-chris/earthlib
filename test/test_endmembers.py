@@ -1,13 +1,19 @@
 import os
+import random
 from tempfile import NamedTemporaryFile
 
 import numpy as np
+import pytest
 
 from earthlib import endmembers, sensors
+from earthlib.errors import EndmemberError
 
 this_dir = os.path.dirname(__file__)
 data_dir = os.path.join(this_dir, "data")
 jfsp_path = os.path.join(data_dir, "jfsp_graysoil.txt")
+
+dtype = "vegetation"
+random_str = "{num:06d}.xyz".format(num=random.randint(1e6, 1e7 - 1))
 
 
 def find_nearest(band_centers, wavelength, spectrum):
@@ -69,10 +75,27 @@ def test_Spectra():
     s.brightness_normalize(inds=np.arange(10))
 
     # test band resampling
-    s = endmembers.Spectra(data=data, sensor=sensor)
     for target_sensor in sensors.supported_sensors.values():
-        s.to_sensor(target_sensor)
-        assert s.data.shape[1] == target_sensor.band_count
+        s = endmembers.Spectra(data=data, sensor=sensor)
+        t = s.to_sensor(target_sensor)
+        assert t.data.shape[1] == target_sensor.band_count
+
+    # test subsampling
+    # s = endmembers.Spectra(data=data, sensor=sensor)
+    n_samples = 3
+    s_sub = endmembers.library.subsample(n_samples)
+    assert len(s_sub) == n_samples
+
+    # subsample by type
+    types = endmembers.listTypes(level=2)
+    for t in types:
+        s_sub = endmembers.library.subsample(n_samples, by_type=t)
+        assert len(s_sub) == n_samples
+        assert (s_sub.metadata["LEVEL_2"] == t).all()
+
+    # test subsampling with invalid type
+    with pytest.raises(EndmemberError):
+        endmembers.library.subsample(n_samples, by_type="InvalidType")
 
     # test output path formatting
     sli, hdr = s.format_output_paths("tmp.sli")
@@ -115,3 +138,17 @@ def test_write_read_sli():
         assert s.data.shape[0] == n_spectra
         assert (s.data == all_values).all()
         assert (s2.data == all_values).all()
+
+
+def test_listTypes():
+    types = endmembers.listTypes()
+    assert dtype in types
+    assert random_str not in types
+
+
+def test_getTypeLevel():
+    valid_level = endmembers.getTypeLevel(dtype)
+    assert valid_level == 2
+
+    invalid_level = endmembers.getTypeLevel(random_str)
+    assert invalid_level == 0

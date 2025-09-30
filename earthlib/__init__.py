@@ -1,7 +1,6 @@
-from earthlib import read, sensors
-from earthlib.endmembers import library
-from earthlib.sensors import supported_sensors
-from earthlib.utils import getBands, getScaler, listSensors, listTypes, selectSpectra
+from earthlib import read, sensors, utils
+from earthlib.endmembers import Spectra, library
+from earthlib.sensors import Sensor, supported_sensors
 
 try:
     from earthlib.geelib import (

@@ -65,6 +65,7 @@ Landsat4 = Sensor(
     ],
     band_centers=[0.485, 0.56, 0.66, 0.835, 1.65, 2.215],
     band_widths=[0.07, 0.08, 0.06, 0.13, 0.2, 0.27],
+    wavelength_unit="micrometers",
     scale=0.0000275,
     offset=-0.2,
 )
@@ -90,6 +91,7 @@ Landsat5 = Sensor(
     ],
     band_centers=[0.485, 0.56, 0.66, 0.835, 1.65, 2.215],
     band_widths=[0.07, 0.08, 0.06, 0.13, 0.2, 0.27],
+    wavelength_unit="micrometers",
     scale=0.0000275,
     offset=-0.2,
 )
@@ -115,6 +117,7 @@ Landsat7 = Sensor(
     ],
     band_centers=[0.485, 0.56, 0.66, 0.835, 1.65, 2.22],
     band_widths=[0.07, 0.08, 0.06, 0.13, 0.2, 0.26],
+    wavelength_unit="micrometers",
     scale=0.0000275,
     offset=-0.2,
 )
@@ -140,6 +143,7 @@ Landsat8 = Sensor(
     ],
     band_centers=[0.482, 0.561, 0.655, 0.865, 1.609, 2.201],
     band_widths=[0.060, 0.057, 0.037, 0.028, 0.085, 0.187],
+    wavelength_unit="micrometers",
     scale=0.0000275,
     offset=-0.2,
 )
@@ -165,6 +169,7 @@ Landsat9 = Sensor(
     ],
     band_centers=[0.482, 0.561, 0.655, 0.865, 1.609, 2.201],
     band_widths=[0.060, 0.057, 0.037, 0.028, 0.085, 0.187],
+    wavelength_unit="micrometers",
     scale=0.0000275,
     offset=-0.2,
 )
@@ -220,6 +225,7 @@ Sentinel2 = Sensor(
         0.142,
         0.240,
     ],
+    wavelength_unit="micrometers",
     scale=0.0001,
 )
 
@@ -254,6 +260,7 @@ MODIS = Sensor(
         2.130,
     ],
     band_widths=[0.020, 0.020, 0.050, 0.035, 0.020, 0.024, 0.050],
+    wavelength_unit="micrometers",
     scale=0.0001,
 )
 
@@ -282,6 +289,7 @@ VIIRS = Sensor(
     ],
     band_centers=[0.445, 0.490, 0.555, 0.673, 0.865, 1.24, 1.61, 2.25],
     band_widths=[0.018, 0.02, 0.02, 0.02, 0.039, 0.02, 0.06, 0.05],
+    wavelength_unit="micrometers",
     scale=0.0001,
 )
 
@@ -305,6 +313,7 @@ AVNIR2 = Sensor(
     band_widths=[0.08, 0.08, 0.08, 0.13],
     scale=1,
     measurement_unit="dn",
+    wavelength_unit="micrometers",
 )
 
 # in radiance
@@ -337,6 +346,7 @@ ASTER = Sensor(
     band_widths=[0.08, 0.06, 0.08, 0.1, 0.04, 0.04, 0.05, 0.07, 0.07],
     scale=1,
     measurement_unit="radiance",
+    wavelength_unit="micrometers",
 )
 
 # Planet collections
@@ -357,6 +367,7 @@ PlanetScope = Sensor(
     ],
     band_centers=[0.485, 0.545, 0.63, 0.82],
     band_widths=[0.06, 0.09, 0.08, 0.08],
+    wavelength_unit="micrometers",
     scale=0.0001,
 )
 
@@ -377,6 +388,7 @@ DoveR = Sensor(
     ],
     band_centers=[0.49, 0.566, 0.666, 0.869],
     band_widths=[0.053, 0.038, 0.032, 0.042],
+    wavelength_unit="micrometers",
     scale=0.0001,
 )
 
@@ -397,6 +409,7 @@ SkySat = Sensor(
     ],
     band_centers=[0.4825, 0.555, 0.65, 0.820],
     band_widths=[0.065, 0.08, 0.09, 0.160],
+    wavelength_unit="micrometers",
     scale=0.0001,
 )
 
@@ -425,6 +438,7 @@ SuperDove = Sensor(
     ],
     band_centers=[0.441, 0.49, 0.531, 0.565, 0.61, 0.665, 0.705, 0.865],
     band_widths=[0.021, 0.05, 0.036, 0.036, 0.02, 0.03, 0.016, 0.04],
+    wavelength_unit="micrometers",
     scale=0.0001,
 )
 
@@ -1595,6 +1609,8 @@ NEON = Sensor(
         2.4466,
     ],
     band_widths=np.ones(neon_band_count) * 0.0075,
+    wavelength_unit="micrometers",
+    measurement_unit="reflectance",
     scale=0.0001,
 )
 

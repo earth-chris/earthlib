@@ -16,15 +16,12 @@ def find_envi_header(path: str) -> tuple[str, str]:
 
     if ext == ".hdr":
         hdr = path
-
     else:
         if check_file(base + ".hdr"):
             hdr = base + ".hdr"
-
         else:
             if check_file(path + ".hdr"):
                 hdr = path + ".hdr"
-
             else:
                 raise FileNotFoundError(f"No header file found for {path}")
 

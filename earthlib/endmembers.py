@@ -9,6 +9,7 @@ import spectral
 import spectral.io.envi as envi
 
 from earthlib.config import endmember_path, metadata
+from earthlib.errors import EndmemberError
 from earthlib.sensors import Earthlib, Sensor
 
 
@@ -157,7 +158,7 @@ class Spectra:
         else:
             warn("Wavelength unit already in micrometers. No conversion applied.")
 
-    def to_sensor(self, sensor: Sensor) -> None:
+    def to_sensor(self, sensor: Sensor) -> "Spectra":
         """Resamples the spectra to a different sensor's band centers.
 
         Updates self.data and self.sensor in-place.
@@ -165,6 +166,9 @@ class Spectra:
         Args:
             sensor: the sensor object defining the instrument
                 to resample the spectra to.
+
+        Returns:
+            a new Spectra object with the resampled spectra and new sensor info.
         """
         # create a band resampler for this collection
         resampler = spectral.BandResampler(
@@ -181,8 +185,66 @@ class Spectra:
             resampled.append(spectrum)
 
         # update the data and sensor info in place
-        self.data = np.array(resampled, dtype=np.float32)
-        self.sensor = sensor.copy()
+        new_spectra = Spectra(
+            data=np.array(resampled, dtype=np.float32),
+            sensor=sensor.copy(),
+            names=self.names.copy(),
+            metadata=self.metadata.copy() if self.metadata is not None else None,
+        )
+        return new_spectra
+
+    def subsample(self, n: int, by_type: str | None = None) -> "Spectra":
+        """Subsamples n random spectra.
+
+        Args:
+            n: the number of random spectra to select.
+            by_type: if set, subsamples n spectra from this land cover type only.
+                Uses the metadata DataFrame to filter by type.
+                If the metadata is not set, raises a ValueError.
+                Get the valid type list using earthlib.utils.listTypes().
+
+        Returns:
+            subsampled Spectra data.
+        """
+        # pre-filter to just the spectra of the selected type
+        if by_type is None:
+            spectra = self.data
+            names = self.names
+            metadata = self.metadata
+
+        else:
+            if self.metadata is None:
+                raise ValueError("Metadata is not set.")
+
+            level = getTypeLevel(by_type)
+            if level == 0:
+                raise EndmemberError(
+                    f"Invalid land cover type: {by_type}. Get valid values from earthlib.listTypes()."
+                )
+
+            key = f"LEVEL_{level}"
+            indices = self.metadata[key] == by_type
+            spectra = self.data[indices, :]
+            names = [self.names[idx] for idx in range(len(self.names)) if indices[idx]]
+            metadata = self.metadata[indices].reset_index(drop=True)
+
+        random_indices = np.random.randint(0, len(spectra), size=n)
+        subsampled_spectra = spectra[random_indices, :]
+        subsampled_names = [names[i] for i in random_indices]
+        subsampled_metadata = (
+            metadata.iloc[random_indices].reset_index(drop=True)
+            if metadata is not None
+            else None
+        )
+
+        endmembers = Spectra(
+            data=subsampled_spectra,
+            sensor=self.sensor.copy(),
+            names=subsampled_names,
+            metadata=subsampled_metadata,
+        )
+
+        return endmembers
 
     def to_sli(
         self,
@@ -309,6 +371,38 @@ class Spectra:
                 hdr = path + ".hdr"
 
         return hdr
+
+
+def listTypes(level: int = 2) -> list:
+    """Returns a list of the spectral classification types.
+
+    Args:
+        level: the level of spectral classification specificity to return. Supports integers 1-4.
+
+    Returns:
+        classes: a list of spectral data types referenced throughout this package.
+    """
+    key = f"LEVEL_{level}"
+    types = list(metadata[key].unique())
+    return types
+
+
+def getTypeLevel(Type: str) -> int:
+    """Checks whether a spectral data type is available in the endmember library.
+
+    Args:
+        Type: the type of spectra to select.
+
+    Returns:
+        level: the metadata "level" of the group for subsetting. returns 0 if not found.
+    """
+    for i in range(4):
+        level = i + 1
+        available_types = listTypes(level=level)
+        if Type in available_types:
+            return level
+
+    return 0
 
 
 library = Spectra.from_sli(endmember_path, sensor=Earthlib, metadata=metadata)
