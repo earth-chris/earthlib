@@ -27,7 +27,6 @@ nav:
     - Introduction: 'introduction.md'
     - Data Sources: 'sources.md'
     - Python Docs:
-        - earthlib.config: 'module/config.md'
         - earthlib.errors: 'module/errors.md'
         - earthlib.endmembers: 'module/endmembers.md'
         - earthlib.metadata: 'module/metadata.md'
