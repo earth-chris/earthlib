@@ -257,8 +257,8 @@ class Spectra:
 
         Args:
             path: the output file path.
-            row_inds: the row-wise indices of the array to write.
-            spectral_inds: indices for which spectral to write
+            rows: the row-wise indices of the array to write.
+            bands: indices for which spectral to write
         """
         sli, hdr = self.format_output_paths(path)
 
