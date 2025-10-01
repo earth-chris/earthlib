@@ -1,4 +1,4 @@
-from earthlib import read, sensors, utils
+from earthlib import metadata, read, sensors
 from earthlib.endmembers import Spectra, library
 from earthlib.sensors import Sensor, supported_sensors
 
