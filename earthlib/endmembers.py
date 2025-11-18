@@ -8,7 +8,7 @@ import pandas as pd
 import spectral
 import spectral.io.envi as envi
 
-from earthlib.config import endmember_path, metadata
+from earthlib.config import endmember_path, full_endmember_path, full_metadata, metadata
 from earthlib.errors import EndmemberError
 from earthlib.sensors import Earthlib, Sensor
 
@@ -52,6 +52,32 @@ class Spectra:
     def __len__(self) -> int:
         """Returns the number of spectra stored."""
         return len(self.data)
+
+    def __getitem__(
+        self, idx: int | slice | list[int] | np.ndarray | pd.Index
+    ) -> "Spectra":
+        """Index the spectra to return a subset."""
+        idx = [idx] if isinstance(idx, int) else idx
+
+        # data subset
+        data = self.data[idx]
+
+        # metadata subset
+        if self.metadata is not None:
+            try:
+                metadata = self.metadata.iloc[idx].reset_index(drop=True)
+            except NotImplementedError:
+                metadata = self.metadata[idx].reset_index(drop=True)
+        else:
+            metadata = None
+
+        # names subset
+        if self.names is not None:
+            names = [self.names[i] for i in idx]
+        else:
+            names = None
+
+        return Spectra(data=data, sensor=self.sensor, metadata=metadata, names=names)
 
     def remove_water_bands(self, set_nan: bool = True) -> None:
         """Masks reflectance data from water vapor absorption bands.
@@ -407,3 +433,7 @@ def getTypeLevel(Type: str) -> int:
 
 
 library = Spectra.from_sli(endmember_path, sensor=Earthlib, metadata=metadata)
+
+full_library = Spectra.from_sli(
+    full_endmember_path, sensor=Earthlib, metadata=full_metadata
+)
