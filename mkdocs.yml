@@ -26,6 +26,7 @@ nav:
     - Home: 'index.md'
     - Introduction: 'introduction.md'
     - Data Sources: 'sources.md'
+    - Earthlib Walkthrough: 'api_walkthrough.ipynb'
     - Python Docs:
         - earthlib.errors: 'module/errors.md'
         - earthlib.endmembers: 'module/endmembers.md'
