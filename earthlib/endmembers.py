@@ -73,7 +73,13 @@ class Spectra:
 
         # names subset
         if self.names is not None:
-            names = [self.names[i] for i in idx]
+            # for boolean indexing
+            if len(idx) == len(self.data):
+                names = [self.names[i] for i in range(len(idx)) if idx[i]]
+            # for integer indexing
+            else:
+                names = [self.names[i] for i in idx]
+            assert len(names) == len(data)
         else:
             names = None
 
