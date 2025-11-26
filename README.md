@@ -3,7 +3,7 @@
 <img src="docs/img/earth-unmixed.png">
 
 <p align="center">
-  <em>A global spectral library for satellite land cover mapping.</em>
+  <em>A spectral library for continuous satellite land cover mapping.</em>
 </p>
 
 ---
@@ -18,13 +18,13 @@
 
 `earthlib` is a python package featuring a global spectral library. It was developed to support satellite-based land cover mapping.
 
-The library contains several thousand unique spectral endmembers representing green vegetation, soil, non-photosynthetic vegetation, urban materials, and burned materials.
+The library contains a diverse catalog of unique spectral endmembers representing green vegetation, bare soil, non-photosynthetic vegetation, urban materials, and burned materials.
 
 The reflectance data cover the visible to the shortwave infrared wavelengths (400-2450 nm) at 10 nm band widths.
 
-`earthlib` provides tools to resample these spectra to match the wavelengths of popular satellite and airborne earth observing sensors. The purpose is to support running [spectral mixture analysis](introduction.md) in a sensor-agnostic way.
+`earthlib` provides tools to resample these spectra to match the wavelengths of popular satellite and airborne earth observing sensors. The purpose is to support running [spectral mixture analysis](introduction.md) in a sensor-agnostic fashion.
 
-Running spectral mixture analysis across sensors with a consistent spectral library presents a new approach to creating analysis-ready data, providing consistent outputs.
+Running spectral mixture analysis across sensors with a consistent spectral library presents a new approach to creating consistent, analysis-ready data.
 
 This library also supports spectral mixture analysis in Google Earth Engine via the `earthengine-api` python package.
 

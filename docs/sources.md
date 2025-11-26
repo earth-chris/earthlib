@@ -24,11 +24,15 @@ Below are plots for the primary land cover types included in `earthlib`.
 
 ## Supported sensors
 
+`earthlib` supports spectral resampling to a wide range of earth observing sensors. Below is a plot with the band centers and ranges for the sensors supported by default.
+
 ![earthlib satellite instruments](img/supported-sensors.png)
 
 Here, the black lines indicate the full-width at half-max (FWHM) of each band, and the colored squares mark the center wavelength for each band.
 
-`NEON`, an imaging spectrometer, measures the full shortwave spectrum (*400-2500 nm*), using over 400 spectral bands to measure continuous spectral variation.
+`NEON`, an imaging spectrometer, measures the full shortwave spectrum (400-2500 nm), using over 400 spectral bands to measure continuous spectral variation.
+
+For sensors not specified here, users can define their own sensor specification using the `earthlib.sensors.Sensor()` class. The [API Walkthrough](api_walkthrough.ipynb) has an example.
 
 
 ### Measurement units
@@ -41,9 +45,7 @@ These datasets can be unmixed once the data have been rescaled: they're typicall
 
 A few data sources are not provided as surface reflectance products: `ASTER` data are provided in radiance (a physical measurement unit, uncorrected for atmospheric composition); `ALOS-AVNIR-2` data are provided in DN (raw sensor measurments).
 
-One would have to first convert from DN to radiance (in the case of `ALOS-AVNIR-2`) then apply atmospheric correction (to convert from radiance to reflectance).
-
-This workflow isn't supported by `earthlib`.
+One would have to first convert from DN to radiance (in the case of `ALOS-AVNIR-2`) then apply atmospheric correction (to convert from radiance to reflectance). This workflow isn't directly supported by `earthlib`.
 
 
 ### Sensors unavailable in Earth Engine
@@ -51,3 +53,5 @@ This workflow isn't supported by `earthlib`.
 `earthlib` provides sensor definitions for `NEON` data (a set of airborne imaging spectrometers) and for a set of data from Planet's Dove constellation (`Dove`, `Dove-R`, `SuperDove`). These are not available as default Earth Engine collections.
 
 You can, however, upload data from these providers as custom user data or from community-contributed datasets. So you can unmix these datasets if you have access to them as Earth Engine Image/Collection assets, but no default collection ID is provided by `earthlib`.
+
+Next, learn more about the [how the earthlib API works](api_walkthrough.ipynb).
