@@ -351,8 +351,8 @@ ASTER = Sensor(
 )
 
 # Planet collections
-PlanetScope = Sensor(
-    name="PlanetScope",
+Dove = Sensor(
+    name="Dove",
     collection=None,
     band_names=[
         "B1",
@@ -1644,6 +1644,7 @@ supported_sensors = {
     "AVNIR2": AVNIR2,
     "ASD": ASD,
     "ASTER": ASTER,
+    "Dove": Dove,
     "DoveR": DoveR,
     "Earthlib": Earthlib,
     "Landsat4": Landsat4,
@@ -1653,7 +1654,6 @@ supported_sensors = {
     "Landsat9": Landsat9,
     "MODIS": MODIS,
     "NEON": NEON,
-    "PlanetScope": PlanetScope,
     "Sentinel2": Sentinel2,
     "SkySat": SkySat,
     "SuperDove": SuperDove,
@@ -1669,6 +1669,12 @@ def list_sensors() -> list:
     """
     sensors = list(supported_sensors.keys())
     return sensors
+
+
+def get_sensor(sensor: str) -> Sensor:
+    """Get the sensor instance, indexed by key."""
+    validate_sensor(sensor)
+    return supported_sensors[sensor]
 
 
 def validate_sensor(sensor: str) -> None:

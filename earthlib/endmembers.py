@@ -8,7 +8,7 @@ import pandas as pd
 import spectral
 import spectral.io.envi as envi
 
-from earthlib.config import endmember_path, metadata
+from earthlib.config import endmember_path, full_endmember_path, full_metadata, metadata
 from earthlib.errors import EndmemberError
 from earthlib.sensors import Earthlib, Sensor
 
@@ -52,6 +52,38 @@ class Spectra:
     def __len__(self) -> int:
         """Returns the number of spectra stored."""
         return len(self.data)
+
+    def __getitem__(
+        self, idx: int | slice | list[int] | np.ndarray | pd.Index
+    ) -> "Spectra":
+        """Index the spectra to return a subset."""
+        idx = [idx] if isinstance(idx, int) else idx
+
+        # data subset
+        data = self.data[idx]
+
+        # metadata subset
+        if self.metadata is not None:
+            try:
+                metadata = self.metadata.iloc[idx].reset_index(drop=True)
+            except NotImplementedError:
+                metadata = self.metadata[idx].reset_index(drop=True)
+        else:
+            metadata = None
+
+        # names subset
+        if self.names is not None:
+            # for boolean indexing
+            if len(idx) == len(self.data):
+                names = [self.names[i] for i in range(len(idx)) if idx[i]]
+            # for integer indexing
+            else:
+                names = [self.names[i] for i in idx]
+            assert len(names) == len(data)
+        else:
+            names = None
+
+        return Spectra(data=data, sensor=self.sensor, metadata=metadata, names=names)
 
     def remove_water_bands(self, set_nan: bool = True) -> None:
         """Masks reflectance data from water vapor absorption bands.
@@ -257,8 +289,8 @@ class Spectra:
 
         Args:
             path: the output file path.
-            row_inds: the row-wise indices of the array to write.
-            spectral_inds: indices for which spectral to write
+            rows: the row-wise indices of the array to write.
+            bands: indices for which spectral to write
         """
         sli, hdr = self.format_output_paths(path)
 
@@ -407,3 +439,7 @@ def getTypeLevel(Type: str) -> int:
 
 
 library = Spectra.from_sli(endmember_path, sensor=Earthlib, metadata=metadata)
+
+full_library = Spectra.from_sli(
+    full_endmember_path, sensor=Earthlib, metadata=full_metadata
+)
