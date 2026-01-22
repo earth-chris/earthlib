@@ -11,6 +11,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    permissions:
+      pages: write
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -19,3 +22,5 @@ jobs:
       - run: pip install mkdocs mkdocs-material mkdocstrings[python] mkdocs-jupyter livereload
       - run: pip install .
       - run: mkdocs gh-deploy --force
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
