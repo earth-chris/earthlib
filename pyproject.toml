@@ -29,6 +29,11 @@ mkdocs-material = ">=9.5"
 mkdocstrings = {extras = ["python"], version = ">=0.25"}
 mkdocs-jupyter = ">=0.24"
 livereload = "^2.6"
+scipy = ">=1.0"
+pysptools = "^0.15.0"
+cvxopt = "^1.3.2"
+scikit-learn = ">=1.0"
+seaborn = "^0.13.2"
 
 [tool.coverage.run]
 omit = ["earthlib/__init__.py", "earthlib/config.py", "earthlib/errors.py", "earthlib/geelib/*"]
