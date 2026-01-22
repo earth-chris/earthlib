@@ -16,12 +16,13 @@ jobs:
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12"]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-    - uses: conda-incubator/setup-miniconda@v2
+    - name: Set up Miniconda
+      uses: conda-incubator/setup-miniconda@v2
       with:
         auto-update-conda: true
         python-version: ${{ matrix.python-version }}
@@ -34,9 +35,6 @@ jobs:
 
     - name: Install package
       run: |
-        pip install pipx
-        pipx ensurepath
-        pipx install poetry==1.2.0
         make create
       if: steps.cache.outputs.cache-hit != 'true'
     - name: Run pytest
