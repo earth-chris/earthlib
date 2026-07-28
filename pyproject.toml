@@ -1,43 +1,154 @@
-[tool.poetry]
+[project]
+authors = [{name = "Christopher Anderson", email = "cbanders@alumni.stanford.edu"}]
 name = "earthlib"
 version = "1.0.0"
 description = "A global spectral library with earth engine tools for satellite land cover mapping."
-authors = ["earth-chris <cbanders@alumni.stanford.edu>"]
 license = "MIT"
 readme = "README.md"
+requires-python = ">=3.9"
 
-[tool.poetry.dependencies]
-python = "^3.9"
-numpy = ">=1.21"
-pandas = ">=1.3"
-spectral = ">=0.22"
-tqdm = ">=4.63"
+dependencies = [
+    "numpy>=1.21",
+    "pandas>=1.3",
+    "spectral>=0.22",
+    "tqdm>=4.63",
+]
 
-[tool.poetry.extras]
+[project.optional-dependencies]
 ee = ["earthengine-api"]
+dev = [
+    "ipython>=8.5",
+    "jupyter>=1.0",
+    "geemap>=0.26",
+    "scipy>=1.0",
+    "pysptools>=0.15.0",
+    "cvxopt>=1.3.2",
+    "scikit-learn>=1.0",
+    "seaborn>=0.13.2",
+]
 
-[tool.poetry.group.dev.dependencies]
-ipython = "^8.5"
-jupyter = "^1.0"
-geemap = "^0.26"
-pre-commit = "^3.4"
-pytest = "^7.4"
-pytest-cov = "^4.1"
-pytest-xdist = "^3.3"
-twine = "^4.0"
-mkdocs-material = ">=9.5"
-mkdocstrings = {extras = ["python"], version = ">=0.25"}
-mkdocs-jupyter = ">=0.24"
-livereload = "^2.6"
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatchling"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "earthlib/",
+    "pixi.lock",
+    "pyproject.toml",
+    "README.md",
+]
+
+[tool.pixi.workspace]
+channels = ["conda-forge"]
+platforms = ["osx-arm64", "linux-64"]
+
+[tool.pixi.dependencies]
+python = "3.12.*"
+
+[tool.pixi.pypi-dependencies]
+earthlib = { path = ".", editable = true }
+
+[tool.pixi.environments]
+lint = { features = ["lint"], solve-group = "lint", no-default-feature = true }
+dev = { features = ["dev", "test", "lint"], solve-group = "default" }
+docs = { features = ["docs"], solve-group = "docs", no-default-feature = true }
+build = { features = ["build"], solve-group = "build", no-default-feature = true }
+
+######## Pixi Test
+
+[tool.pixi.feature.test.pypi-dependencies]
+pytest = ">=7.4"
+pytest-xdist = ">=3.3"
+pytest-cov = ">=4.1"
+
+[tool.pixi.feature.test.tasks]
+test = "pytest -n auto --cov --no-cov-on-fail --cov-report=term-missing"
+
+######## Pixi Docs
+
+[tool.pixi.feature.docs.dependencies]
+python = ">=3.11"
+
+[tool.pixi.feature.docs.pypi-dependencies]
+mkdocstrings = {extras = ["python"], version = "*"}
+mkdocs = "*"
+mkdocs-jupyter = "*"
+mkdocs-material = "*"
+livereload = "*"
+
+[tool.pixi.feature.docs.tasks]
+docs-deploy = "mkdocs gh-deploy --force"
+docs-serve = "mkdocs serve"
+
+######## Pixi Lint
+
+[tool.pixi.feature.lint.dependencies]
+python = ">=3.9"
+
+[tool.pixi.feature.lint.pypi-dependencies]
+ruff = ">=0.4"
+pre-commit = ">=3.4"
+
+[tool.pixi.feature.lint.tasks]
+_setup = "pre-commit install"
+lint = { cmd = "pre-commit run --all-files", depends-on = ["_setup"] }
+
+######## Pixi Build
+
+[tool.pixi.feature.build.dependencies]
+python = ">=3.9"
+
+[tool.pixi.feature.build.pypi-dependencies]
+hatch = "*"
+twine = "*"
+
+[tool.pixi.feature.build.tasks]
+build = "hatch build"
+deploy = { cmd = "twine upload dist/*", depends-on = ["build"] }
+
+######## Pixi Dev
+
+[tool.pixi.feature.dev.pypi-dependencies]
+ipython = ">=8.5"
+jupyter = ">=1.0"
+geemap = ">=0.26"
 scipy = ">=1.0"
-pysptools = "^0.15.0"
-cvxopt = "^1.3.2"
+pysptools = ">=0.15.0"
+cvxopt = ">=1.3.2"
 scikit-learn = ">=1.0"
-seaborn = "^0.13.2"
+seaborn = ">=0.13.2"
+
+
+### Tool Config ###
+
+[tool.pytest.ini_options]
+addopts = "--cov=earthlib --no-cov-on-fail --cov-report=term-missing"
 
 [tool.coverage.run]
 omit = ["earthlib/__init__.py", "earthlib/config.py", "earthlib/errors.py", "earthlib/geelib/*"]
 
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[tool.ruff]
+exclude = [
+    ".git",
+    ".mypy_cache",
+    ".ruff_cache",
+    ".venv",
+    "__pypackages__",
+    "build",
+    "dist",
+    "venv",
+    "notebooks",
+]
+line-length = 88
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["F", "E", "W", "I001"]
+ignore = ["E203", "E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401", "F403"]
+
+[tool.ruff.format]
+quote-style = "double"

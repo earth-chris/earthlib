@@ -1,29 +1,23 @@
-default_language_version:
-  python: python3.10
-
 repos:
-  - repo: https://github.com/ambv/black
-    rev: 24.8.0
-    hooks:
-      - id: black
-        args: ["earthlib", "--line-length=88", "--target-version=py310"]
-
-  - repo: https://github.com/pycqa/flake8
-    rev: 7.1.1
-    hooks:
-      - id: flake8
-        args: ["--select=C,E,F,W,B,B950", "--max-line-length=88", "--ignore=E203,E501,W503,F401,F403,E266,F821", "--exclude=bin,ipython,legacy,plots"]
-
-  - repo: https://github.com/timothycrosley/isort
-    rev: 5.13.2
-    hooks:
-      - id: isort
-        args: ["-l 88", "--profile", "black", "."]
-
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
     hooks:
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
       - id: check-yaml
       - id: detect-private-key
-      - id: end-of-file-fixer
-      - id: requirements-txt-fixer
+
+  - repo: local
+    hooks:
+      - id: ruff_format
+        name: Format with ruff
+        language: system
+        types: [python]
+        entry: ruff format
+
+      - id: ruff_lint
+        name: Lint with ruff
+        language: system
+        types: [python]
+        entry: ruff check
+        args: ["--fix"]

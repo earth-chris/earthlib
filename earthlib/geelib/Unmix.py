@@ -35,7 +35,6 @@ def fractionalCover(
 
     # loop through each iteration and unmix each
     for spectra in zip(*endmembers):
-
         if shade_normalize:
             spectra += (shade,)
 
