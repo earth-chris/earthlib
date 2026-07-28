@@ -443,6 +443,60 @@ SuperDove = Sensor(
     scale=0.0001,
 )
 
+Pelican = Sensor(
+    name="Pelican",
+    collection=None,
+    band_names=[
+        "B1",
+        "B2",
+        "B3",
+        "B4",
+        "B5",
+        "B6",
+        "B7",
+    ],
+    band_descriptions=[
+        "panchromatic",
+        "blue",
+        "green",
+        "red",
+        "red edge",
+        "near infrared wide",
+        "near infrared narrow",
+    ],
+    band_centers=[0.625, 0.492, 0.566, 0.666, 0.708, 0.832, 0.867],
+    band_widths=[0.35, 0.053, 0.038, 0.032, 0.017, 0.106, 0.041],
+    wavelength_unit="micrometers",
+    scale=0.0001,
+)
+
+Pelican2 = Sensor(
+    name="Pelican2",
+    collection=None,
+    band_names=[
+        "B1",
+        "B2",
+        "B3",
+        "B4",
+        "B5",
+        "B6",
+        "B7",
+    ],
+    band_descriptions=[
+        "panchromatic",
+        "blue",
+        "green",
+        "red",
+        "red edge",
+        "red edge II",
+        "near infrared",
+    ],
+    band_centers=[0.625, 0.485, 0.555, 0.66, 0.704, 0.74, 0.83],
+    band_widths=[0.35, 0.07, 0.07, 0.06, 0.022, 0.022, 0.12],
+    wavelength_unit="micrometers",
+    scale=0.0001,
+)
+
 neon_band_count = 385
 
 NEON = Sensor(
