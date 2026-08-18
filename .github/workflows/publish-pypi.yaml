@@ -1,4 +1,5 @@
 name: publish-pypi
+
 on:
   push:
     tags:
@@ -9,15 +10,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install poetry
-        run: pipx install poetry
-      - name: Python setup
-        uses: actions/setup-python@v5
+      - uses: prefix-dev/setup-pixi@v0.8.1
         with:
-          python-version: 3.11
+          environments: build
       - name: Build package
-        run: |
-          poetry build
+        run: pixi run -e build build
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:

@@ -4,6 +4,7 @@ from typing import Callable
 
 import ee
 
+from earthlib.errors import SensorError
 from earthlib.utils import getBandDescriptions, getBands
 
 

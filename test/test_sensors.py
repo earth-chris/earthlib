@@ -9,7 +9,7 @@ sensor = "Sentinel2"
 band = "B8"
 band_description = "near infrared"
 dtype = "vegetation"
-random_str = "{num:06d}.xyz".format(num=random.randint(1e6, 1e7 - 1))
+random_str = "{num:06d}.xyz".format(num=random.randint(int(1e6), int(1e7) - 1))
 
 
 def test_Sensor():
