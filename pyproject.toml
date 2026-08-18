@@ -50,6 +50,7 @@ python = "3.12.*"
 earthlib = { path = ".", editable = true }
 
 [tool.pixi.environments]
+default = { features = ["test"], solve-group = "default" }
 lint = { features = ["lint"], solve-group = "lint", no-default-feature = true }
 dev = { features = ["dev", "test", "lint"], solve-group = "default" }
 docs = { features = ["docs"], solve-group = "docs", no-default-feature = true }
@@ -109,13 +110,15 @@ deploy = { cmd = "twine upload dist/*", depends-on = ["build"] }
 
 ######## Pixi Dev
 
+[tool.pixi.feature.dev.dependencies]
+cvxopt = ">=1.3.2"
+
 [tool.pixi.feature.dev.pypi-dependencies]
 ipython = ">=8.5"
 jupyter = ">=1.0"
 geemap = ">=0.26"
 scipy = ">=1.0"
 pysptools = ">=0.15.0"
-cvxopt = ">=1.3.2"
 scikit-learn = ">=1.0"
 seaborn = ">=0.13.2"
 
