@@ -1,6 +1,6 @@
 # The Earth Library
 
-<img src="docs/img/earth-unmixed.png">
+<img src="https://earth-chris.github.io/earthlib/img/earth-unmixed.png">
 
 <p align="center">
   <em>A spectral library for continuous satellite land cover mapping.</em>
@@ -22,13 +22,11 @@ The library contains a diverse catalog of unique spectral endmembers representin
 
 The reflectance data cover the visible to the shortwave infrared wavelengths (400-2450 nm) at 10 nm band widths.
 
-`earthlib` provides tools to resample these spectra to match the wavelengths of popular satellite and airborne earth observing sensors. The purpose is to support running [spectral mixture analysis](introduction.md) in a sensor-agnostic fashion.
+`earthlib` provides tools to resample these spectra to match the wavelengths of popular satellite and airborne earth observing sensors. The purpose is to support running [spectral mixture analysis](https://earth-chris.github.io/earthlib/introduction/) in a sensor-agnostic fashion.
 
 Running spectral mixture analysis across sensors with a consistent spectral library presents a new approach to creating consistent, analysis-ready data.
 
-This library also supports spectral mixture analysis in Google Earth Engine via the `earthengine-api` python package.
-
-The goal of `earthlib` is to help users quantify spatial and temporal patterns of global land cover change in a [sensor-generic](sources.md) fashion.
+The goal of `earthlib` is to help users quantify spatial and temporal patterns of global land cover change in a [sensor-generic](https://earth-chris.github.io/earthlib/sources/) fashion.
 
 
 ## :seedling: Installation
@@ -39,14 +37,6 @@ This library can be installed via `pip`.
 pip install earthlib
 ```
 
- Earth Engine is an optional dependency, not installed by default. These routines are not well-tested since best-practices for Earth Engine API testing are not clear.
- 
- To install the Google Earth Engine utilities with earthlib:
-
-```bash
-pip install earthlib[ee]
-```
-
 You can also clone the source repository and install it locally.
 
 ```bash
@@ -54,6 +44,29 @@ git clone https://github.com/earth-chris/earthlib.git
 cd earthlib
 pip install -e .
 ```
+
+The Earth Engine routines (`earthlib.geelib`) are not currently available. They are out of date with the v1.1 API and are being reworked. The spectral library is unaffected.
+
+## :hammer_and_wrench: Development
+
+`earthlib` uses [pixi](https://pixi.sh) to manage environments.
+
+```bash
+git clone https://github.com/earth-chris/earthlib.git
+cd earthlib
+pixi install
+```
+
+Common tasks:
+
+```bash
+pixi run test                    # run tests with coverage
+pixi run -e lint lint            # format and lint (installs pre-commit hooks)
+pixi run -e typecheck typecheck  # run mypy
+pixi run -e docs docs-serve      # serve docs locally
+```
+
+Please commit using the development environment to ensure code is well-formatted.
 
 ## :deciduous_tree: Developed by
 
@@ -64,6 +77,6 @@ pip install -e .
 <a href="https://orcid.org/0000-0001-7392-4368">![ORC-ID](https://img.shields.io/badge/ORCID-0000--0001--7392--4368-brightgreen)</a>
 <a href="https://github.com/earth-chris">![GitHub Stars](https://img.shields.io/github/stars/earth-chris?affiliations=OWNER%2CCOLLABORATOR&style=social)</a>
 
-This package was primarily developed at the Stanford Center for Conservation Biology and at Salo Sciences.
+This package was primarily developed at the Stanford Center for Conservation Biology and Salo Sciences.
 
 [^1]: [Planet Labs PBC](https://www.planet.com)

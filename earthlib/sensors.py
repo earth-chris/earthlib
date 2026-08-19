@@ -28,7 +28,7 @@ class Sensor:
     wavelength_unit: Literal["micrometers", "nanometers"] = "micrometers"
     measurement_unit: Literal["reflectance", "radiance", "dn"] = "reflectance"
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if not isinstance(self.band_centers, np.ndarray):
             self.band_centers = np.array(self.band_centers, dtype=np.float32)
         if self.band_widths is not None:
@@ -1674,6 +1674,7 @@ Earthlib = Sensor(
     collection=None,
     band_names=[f"band_{i + 1}" for i in range(_eli_data.params.ncols)],
     band_centers=_eli_data.bands.centers,
+    band_widths=np.full(_eli_data.params.ncols, 0.01),
     wavelength_unit=_eli_data.bands.band_unit.lower(),
     measurement_unit="reflectance",
     scale=1,
@@ -1708,6 +1709,8 @@ supported_sensors = {
     "Landsat9": Landsat9,
     "MODIS": MODIS,
     "NEON": NEON,
+    "Pelican": Pelican,
+    "Pelican2": Pelican2,
     "Sentinel2": Sentinel2,
     "SkySat": SkySat,
     "SuperDove": SuperDove,
@@ -1726,9 +1729,26 @@ def list_sensors() -> list:
 
 
 def get_sensor(sensor: str) -> Sensor:
-    """Get the sensor instance, indexed by key."""
+    """Get a copy of the sensor instance, indexed by key.
+
+    A copy is returned so callers cannot mutate the shared module-level sensor.
+
+    Args:
+        sensor: the name of the sensor (from earthlib.list_sensors()).
+
+    Returns:
+        a copy of the sensor definition.
+
+    Raises:
+        SensorError: when an invalid sensor name is passed.
+
+    Example:
+        ```python
+        landsat = get_sensor("Landsat8")
+        ```
+    """
     validate_sensor(sensor)
-    return supported_sensors[sensor]
+    return supported_sensors[sensor].copy()
 
 
 def validate_sensor(sensor: str) -> None:
@@ -1747,21 +1767,21 @@ def validate_sensor(sensor: str) -> None:
         )
 
 
-def get_collection_name(sensor: str) -> str:
+def get_collection_name(sensor: str) -> str | None:
     """Returns the earth engine collection name for a specific satellite sensor.
 
     Args:
         sensor: the name of the sensor (from earthlib.list_sensors()).
 
     Returns:
-        collection: a string with the earth engine collection.
+        collection: the earth engine collection, or None for sensors that have none.
     """
     validate_sensor(sensor)
     collection = supported_sensors[sensor].collection
     return collection
 
 
-def get_scaler(sensor: str) -> str:
+def get_scaler(sensor: str) -> float:
     """Returns the scaling factor to convert sensor data to percent reflectance (0-1).
 
     Args:
@@ -1775,55 +1795,70 @@ def get_scaler(sensor: str) -> str:
     return scaler
 
 
-def get_bands(sensor: str) -> list:
+def get_bands(sensor: str) -> list[str] | None:
     """Returns a list of available band names by sensor.
 
     Args:
         sensor: the name of the sensor (from earthlib.list_sensors()).
 
     Returns:
-        bands: a list of sensor-specific band names.
+        bands: a list of sensor-specific band names, or None when unnamed.
     """
     validate_sensor(sensor)
     bands = supported_sensors[sensor].band_names
     return bands
 
 
-def get_band_descriptions(sensor: str) -> list:
+def get_band_descriptions(sensor: str) -> list[str] | None:
     """Returns a list band name descriptions by sensor.
 
     Args:
-        sensor: the name of the sensor (from earthlib.listSensors()).
+        sensor: the name of the sensor (from earthlib.list_sensors()).
 
     Returns:
-        bands: a list of sensor-specific band names.
+        bands: a list of sensor-specific band descriptions, or None when undescribed.
     """
     validate_sensor(sensor)
     bands = supported_sensors[sensor].band_descriptions
     return bands
 
 
-def get_band_indices(custom_bands: list, sensor: str) -> list:
+def get_band_indices(custom_bands: list[str] | str, sensor: str) -> list[int]:
     """Cross-references a list of bands passed as strings to the 0-based integer indices
 
+    Indices are returned in the order the bands were requested.
+
     Args:
-        custom_bands: a list of band names.
+        custom_bands: a band name, or a list of band names.
         sensor: a string sensor type for indexing the supported collections.
 
     Returns:
         indices: list of integer band indices.
+
+    Raises:
+        SensorError: when the sensor is invalid, has no named bands, or when a
+            requested band is not one of the sensor's bands.
+
+    Example:
+        ```python
+        indices = get_band_indices(["SR_B4", "SR_B3", "SR_B2"], "Landsat8")
+        ```
     """
     validate_sensor(sensor)
     sensor_bands = supported_sensors[sensor].band_names
+
+    if sensor_bands is None:
+        raise SensorError(f"Sensor {sensor} has no named bands.")
+
+    requested = [custom_bands] if isinstance(custom_bands, str) else list(custom_bands)
+
     indices = list()
+    for band in requested:
+        if band not in sensor_bands:
+            raise SensorError(
+                f"Invalid band: {band}. Supported for {sensor}: "
+                f"{', '.join(sensor_bands)}"
+            )
+        indices.append(sensor_bands.index(band))
 
-    if type(custom_bands) in (list, tuple):
-        for band in custom_bands:
-            if band in sensor_bands:
-                indices.append(sensor_bands.index(band))
-
-    elif isinstance(custom_bands, str):
-        indices.append(sensor_bands.index(custom_bands))
-
-    indices.sort()
     return indices
