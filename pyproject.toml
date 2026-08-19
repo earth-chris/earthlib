@@ -1,13 +1,14 @@
 [project]
 authors = [{name = "Christopher Anderson", email = "cbanders@alumni.stanford.edu"}]
 name = "earthlib"
-version = "1.0.0"
+version = "1.1.0"
 description = "A global spectral library with earth engine tools for satellite land cover mapping."
 license = "MIT"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 
 dependencies = [
+    "loguru>=0.7",
     "numpy>=1.21",
     "pandas>=1.3",
     "spectral>=0.22",
@@ -16,16 +17,6 @@ dependencies = [
 
 [project.optional-dependencies]
 ee = ["earthengine-api"]
-dev = [
-    "ipython>=8.5",
-    "jupyter>=1.0",
-    "geemap>=0.26",
-    "scipy>=1.0",
-    "pysptools>=0.15.0",
-    "cvxopt>=1.3.2",
-    "scikit-learn>=1.0",
-    "seaborn>=0.13.2",
-]
 
 [build-system]
 build-backend = "hatchling.build"
@@ -43,18 +34,34 @@ include = [
 channels = ["conda-forge"]
 platforms = ["osx-arm64", "linux-64"]
 
-[tool.pixi.dependencies]
-python = "3.12.*"
-
 [tool.pixi.pypi-dependencies]
 earthlib = { path = ".", editable = true }
 
 [tool.pixi.environments]
-default = { features = ["test"], solve-group = "default" }
+default = { features = ["py312", "test"], solve-group = "py312" }
+py311 = { features = ["py311", "test"], solve-group = "py311" }
+py312 = { features = ["py312", "test"], solve-group = "py312" }
+py313 = { features = ["py313", "test"], solve-group = "py313" }
+py314 = { features = ["py314", "test"], solve-group = "py314" }
 lint = { features = ["lint"], solve-group = "lint", no-default-feature = true }
-dev = { features = ["dev", "test", "lint"], solve-group = "default" }
+dev = { features = ["dev", "test", "lint", "py312"], solve-group = "py312" }
 docs = { features = ["docs"], solve-group = "docs", no-default-feature = true }
 build = { features = ["build"], solve-group = "build", no-default-feature = true }
+typecheck = { features = ["typecheck", "py312"], solve-group = "typecheck" }
+
+######## Pixi Python versions
+
+[tool.pixi.feature.py311.dependencies]
+python = "3.11.*"
+
+[tool.pixi.feature.py312.dependencies]
+python = "3.12.*"
+
+[tool.pixi.feature.py313.dependencies]
+python = "3.13.*"
+
+[tool.pixi.feature.py314.dependencies]
+python = "3.14.*"
 
 ######## Pixi Test
 
@@ -108,6 +115,15 @@ twine = "*"
 build = "hatch build"
 deploy = { cmd = "twine upload dist/*", depends-on = ["build"] }
 
+######## Pixi Typecheck
+
+[tool.pixi.feature.typecheck.pypi-dependencies]
+mypy = ">=1.10"
+pandas-stubs = "*"
+
+[tool.pixi.feature.typecheck.tasks]
+typecheck = "mypy earthlib"
+
 ######## Pixi Dev
 
 [tool.pixi.feature.dev.dependencies]
@@ -131,6 +147,16 @@ addopts = "--cov=earthlib --no-cov-on-fail --cov-report=term-missing"
 [tool.coverage.run]
 omit = ["earthlib/__init__.py", "earthlib/config.py", "earthlib/errors.py", "earthlib/geelib/*"]
 
+[tool.mypy]
+python_version = "3.12"
+files = ["earthlib"]
+disallow_untyped_defs = true
+exclude = ["earthlib/geelib/"]
+
+[[tool.mypy.overrides]]
+module = ["spectral.*", "spectral.io.envi.*"]
+ignore_missing_imports = true
+
 [tool.ruff]
 exclude = [
     ".git",
@@ -144,7 +170,7 @@ exclude = [
     "notebooks",
 ]
 line-length = 88
-target-version = "py39"
+target-version = "py311"
 
 [tool.ruff.lint]
 select = ["F", "E", "W", "I001"]

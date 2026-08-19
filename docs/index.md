@@ -26,8 +26,6 @@ The reflectance data cover the visible to the shortwave infrared wavelengths (40
 
 Running spectral mixture analysis across sensors with a consistent spectral library presents a new approach to creating consistent, analysis-ready data.
 
-This library also supports spectral mixture analysis in Google Earth Engine via the `earthengine-api` python package.
-
 The goal of `earthlib` is to help users quantify spatial and temporal patterns of global land cover change in a [sensor-generic](sources.md) fashion.
 
 
@@ -39,13 +37,9 @@ This library can be installed via `pip`.
 pip install earthlib
 ```
 
- Earth Engine is an optional dependency, not installed by default. These routines are not well-tested since best-practices for Earth Engine API testing are not clear.
- 
- To install the Google Earth Engine utilities with earthlib:
-
-```bash
-pip install earthlib[ee]
-```
+The Google Earth Engine routines (`earthlib.geelib`) are not currently available. They
+are out of date with the v1.0 API and are being reworked; the spectral library itself is
+unaffected.
 
 You can also clone the source repository and install it locally.
 

@@ -1,1 +1,1 @@
-::: earthlib.BrightMask
+::: earthlib.geelib.BrightMask

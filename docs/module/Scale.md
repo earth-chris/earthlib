@@ -1,1 +1,1 @@
-::: earthlib.Scale
+::: earthlib.geelib.Scale

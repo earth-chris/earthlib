@@ -31,6 +31,44 @@ def test_find_envi_header():
         read.find_envi_header("nonexistent_file.sli")
 
 
+def test_find_envi_header_missing_hdr_path():
+    with pytest.raises(FileNotFoundError):
+        read.find_envi_header("nonexistent_file.hdr")
+
+
+@pytest.mark.parametrize(
+    "path,expected_sli,expected_hdr",
+    [
+        ("tmp.sli", "tmp.sli", "tmp.hdr"),
+        ("tmp", "tmp.sli", "tmp.hdr"),
+        ("tmp.hdr", "tmp.sli", "tmp.hdr"),
+    ],
+)
+def test_envi_output_paths(path, expected_sli, expected_hdr):
+    sli, hdr = read.envi_output_paths(path)
+    assert sli == expected_sli
+    assert hdr == expected_hdr
+
+
+def test_envi_library():
+    data, names, sensor = read.envi_library(endmember_path)
+    hdr = envi.open(header_path)
+    assert (data == hdr.spectra).all()
+    assert len(names) == data.shape[0]
+    assert sensor.band_count == hdr.params.ncols
+
+
+def test_spectral_library_and_from_sli_agree():
+    """read.spectral_library and Spectra.from_sli must not diverge."""
+    from earthlib.endmembers import Spectra
+
+    a = read.spectral_library(endmember_path)
+    b = Spectra.from_sli(endmember_path)
+    assert (a.data == b.data).all()
+    assert a.names == b.names
+    assert (a.sensor.band_centers == b.sensor.band_centers).all()
+
+
 def test_read_sli():
     s = read.spectral_library(endmember_path)
     hdr = envi.open(header_path)
@@ -45,3 +83,5 @@ def test_jfsp():
     assert s.sensor.band_centers.shape[0] == 2151
     assert (s.data >= 0).all()
     assert (s.data <= 1).all()
+    assert s.spectra_stdevp is not None
+    assert s.spectra_stdevm is not None

@@ -34,6 +34,6 @@ class Schema:
         return Schema(**asdict(self))
 
 
-def to_dataframe(schemas: Iterable[Schema]):
+def to_dataframe(schemas: Iterable[Schema]) -> pd.DataFrame:
     """Converts a list of Schema objects to a pandas DataFrame."""
     return pd.DataFrame([asdict(s) for s in schemas])

@@ -1,1 +1,1 @@
-::: earthlib.ShadeMask
+::: earthlib.geelib.ShadeMask

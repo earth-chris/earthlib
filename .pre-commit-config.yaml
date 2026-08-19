@@ -13,11 +13,11 @@ repos:
         name: Format with ruff
         language: system
         types: [python]
-        entry: ruff format
+        entry: pixi run -e lint ruff format
 
       - id: ruff_lint
         name: Lint with ruff
         language: system
         types: [python]
-        entry: ruff check
+        entry: pixi run -e lint ruff check
         args: ["--fix"]
