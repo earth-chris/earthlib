@@ -39,7 +39,7 @@ jobs:
         run: pixi run -e build twine check dist/*
 
       - name: Publish to PyPI
-        if: github.event_name != 'workflow_dispatch' || !inputs.dry-run
+        if: github.event_name != 'workflow_dispatch' || !inputs['dry-run']
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           verbose: true
