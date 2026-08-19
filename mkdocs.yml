@@ -63,6 +63,7 @@ theme:
 # extras
 plugins:
     - search
+    - include-markdown
     - mkdocstrings
     - mkdocs-jupyter:
         include_source: True

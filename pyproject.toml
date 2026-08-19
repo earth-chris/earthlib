@@ -81,6 +81,7 @@ python = ">=3.11"
 [tool.pixi.feature.docs.pypi-dependencies]
 mkdocstrings = {extras = ["python"], version = "*"}
 mkdocs = "*"
+mkdocs-include-markdown-plugin = "*"
 mkdocs-jupyter = "*"
 mkdocs-material = "*"
 livereload = "*"
