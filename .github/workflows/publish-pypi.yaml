@@ -4,20 +4,42 @@ on:
   push:
     tags:
       - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: "Build and check the distributions without uploading"
+        type: boolean
+        default: false
 
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
     steps:
       - uses: actions/checkout@v4
       - uses: prefix-dev/setup-pixi@v0.8.1
         with:
           environments: build
+
+      - name: Verify tag matches package version
+        if: github.event_name == 'push'
+        run: |
+          tag_version="${GITHUB_REF_NAME#v}"
+          pkg_version="$(pixi run -e build hatch version)"
+          if [ "$tag_version" != "$pkg_version" ]; then
+            echo "::error::Tag ${GITHUB_REF_NAME} does not match package version ${pkg_version}"
+            exit 1
+          fi
+
       - name: Build package
         run: pixi run -e build build
+
+      - name: Check distributions
+        run: pixi run -e build twine check dist/*
+
       - name: Publish to PyPI
+        if: ${{ !inputs.dry-run }}
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          password: ${{ secrets.PYPI_API_TOKEN }}
-          packages_dir: ./dist
           verbose: true
