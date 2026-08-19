@@ -63,6 +63,9 @@ def find_envi_header(path: str) -> str:
 def envi_output_paths(path: str) -> tuple[str, str]:
     """Formats the pair of output paths used to write an ENVI spectral library.
 
+    Handles both header naming conventions, so a path produced by
+    `find_envi_header` round-trips back to the library it came from.
+
     Args:
         path: the base file path, with or without an extension.
 
@@ -80,6 +83,9 @@ def envi_output_paths(path: str) -> tuple[str, str]:
         return path, f"{base}.hdr"
 
     if ext.lower() == ".hdr":
+        # a `spectra.sli.hdr` sidecar already carries the library name in its base
+        if base.lower().endswith(".sli"):
+            return base, path
         return f"{base}.sli", path
 
     return f"{base}.sli", f"{base}.hdr"

@@ -42,12 +42,21 @@ def test_find_envi_header_missing_hdr_path():
         ("tmp.sli", "tmp.sli", "tmp.hdr"),
         ("tmp", "tmp.sli", "tmp.hdr"),
         ("tmp.hdr", "tmp.sli", "tmp.hdr"),
+        ("tmp.sli.hdr", "tmp.sli", "tmp.sli.hdr"),
     ],
 )
 def test_envi_output_paths(path, expected_sli, expected_hdr):
     sli, hdr = read.envi_output_paths(path)
     assert sli == expected_sli
     assert hdr == expected_hdr
+
+
+def test_envi_output_paths_round_trips_find_envi_header():
+    """A header located by find_envi_header must map back to its own library."""
+    hdr = read.find_envi_header(endmember_path)
+    sli, hdr_again = read.envi_output_paths(hdr)
+    assert sli == endmember_path
+    assert hdr_again == hdr
 
 
 def test_envi_library():

@@ -179,6 +179,19 @@ def test_getitem_boolean_mask():
     assert (s.metadata["LEVEL_2"] == "npv").all()
 
 
+def test_getitem_boolean_mask_as_numpy_array():
+    mask = (endmembers.library.metadata["LEVEL_2"] == "npv").to_numpy()
+    s = endmembers.library[mask]
+    assert len(s) == int(mask.sum())
+
+
+def test_getitem_boolean_mask_as_plain_list():
+    mask = [i < 4 for i in range(len(endmembers.library))]
+    s = endmembers.library[mask]
+    assert len(s) == 4
+    assert s.names == endmembers.library.names[:4]
+
+
 def test_getitem_integer_list_matching_length_is_not_a_mask():
     """An integer list as long as the library must not be read as a boolean mask."""
     n = len(endmembers.library)

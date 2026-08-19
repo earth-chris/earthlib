@@ -12,6 +12,9 @@ from earthlib.config import endmember_path, full_endmember_path, full_metadata, 
 from earthlib.errors import EndmemberError
 from earthlib.sensors import Earthlib, Sensor
 
+# every index form Spectra.__getitem__ accepts
+SpectraIndex = int | slice | list[int] | list[bool] | np.ndarray | pd.Index | pd.Series
+
 
 class Spectra:
     """Base class for endmember spectra management."""
@@ -59,9 +62,7 @@ class Spectra:
         """Returns the number of spectra stored."""
         return len(self.data)
 
-    def __getitem__(
-        self, idx: int | slice | list[int] | np.ndarray | pd.Index
-    ) -> "Spectra":
+    def __getitem__(self, idx: SpectraIndex) -> "Spectra":
         """Index the spectra to return a subset.
 
         Supports integer, slice, integer-sequence and boolean-mask indexing.
@@ -93,9 +94,7 @@ class Spectra:
 
         return Spectra(data=data, sensor=self.sensor, metadata=metadata, names=names)
 
-    def _resolve_index(
-        self, idx: int | slice | list[int] | np.ndarray | pd.Index
-    ) -> np.ndarray:
+    def _resolve_index(self, idx: SpectraIndex) -> np.ndarray:
         """Normalizes any supported index into an array of integer positions.
 
         Boolean masks are distinguished from integer sequences by dtype, so an
